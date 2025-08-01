@@ -217,8 +217,38 @@ logForm.addEventListener('submit', e => {
     rounds:  rowCount
   };
 
-  // 1) Log it
-  console.log('Submitting log:', payload);
+  // 1) Log it in mongodb
+fetch('/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload)
+})
+  .then(res => {
+    if (!res.ok) throw new Error(res.statusText);
+    return res.json();
+  })
+  .then(json => {
+    console.log('Saved to Mongo:', json);
+
+    // then your existing cleanup code…
+    formContainer.classList.remove('visible');
+    formContainer.classList.add('hidden');
+    btnLog.classList.remove('active');
+    btnLog.textContent = '+';
+    players = [];
+    winnersList = [];
+    points = {};
+    rowCount = 1;
+    gameInput.value = '';
+    dateInput.valueAsDate = new Date();
+    playerInput.value = '';
+    noWinnerCheckbox.checked = false;
+    renderPlayers();
+  })
+  .catch(err => {
+    console.error('Error saving log:', err);
+    alert('Error saving your log, see console.');
+  });
 
   // 2) Close & reset the form UI
   formContainer.classList.remove('visible');
