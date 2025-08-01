@@ -8,9 +8,9 @@ export async function onRequestPost({ request, env }) {
     return new Response('Invalid JSON', { status: 400 });
   }
 
-  const uri = env.MONGO_URI;
+  const uri = env.MONGODB_URI;
   if (!uri) {
-    return new Response('Missing MONGO_URI', { status: 500 });
+    return new Response('Missing MONGODB_URI', { status: 500 });
   }
 
   const client = new MongoClient(uri);
