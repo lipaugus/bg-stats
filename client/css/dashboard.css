@@ -1,0 +1,354 @@
+header {
+  padding: 16px;
+  display: flex;
+}
+
+/* Remove up/down arrows in Chrome, Safari, Edge */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove up/down arrows in Firefox */
+input[type=number] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+#btn-loggear {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: transparent;
+  border: 2px solid #7ad069;
+  color: #7ad069;
+  padding: 8px 16px;
+  font-size: 23px;
+  cursor: pointer;
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  transform: rotate(0deg);
+  transition: transform 0.3s ease, background 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
+  line-height: 0;
+}
+#btn-loggear:hover {
+  background: #7ad069;
+  color: #161616;
+}
+#btn-loggear.active {
+  font-size: 16px;
+  background: #161616;
+  border-color: #e74c3c;
+  color: #e74c3c;
+  transform: rotate(90deg);
+  transition: transform 0.3s ease, background 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
+}
+#btn-loggear.active:hover {
+  background: #e74c3c;
+  border-color: #e74c3c;
+  color: #161616;
+}
+
+/* Hide any "hidden" class element*/
+.hidden {
+  display: none;
+}
+
+/* Log form big container */
+#log-form-container {
+  padding: 16px;
+}
+
+#log-form {
+  background-color: #1e1e1e;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 480px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#log-form h2 {
+  margin: 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* Container animation */
+.log-form-container {
+  /* start hidden but keep it in-layout for animation */
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+.log-form-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Log input boxes */
+.input-log-box {
+  background-color: #1b1b1b;
+  color: white;
+  padding: 7px;
+  border: 0;
+  border-bottom: 1px solid white;
+}
+
+/* Remove dropdown arrow from game select box */
+#game-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 1px;
+  text-overflow: "";
+}
+
+/* Change calendar logo on date picker to white */
+#date-played::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* No winners checkbox */
+.no-winner-checkbox * {
+  box-sizing: border-box;
+}
+.no-winner-checkbox .cbx {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  display: inline-block;
+  font-size: 0.8rem;
+}
+.no-winner-checkbox .cbx:not(:last-child) {
+  margin-right: 6px;
+}
+.no-winner-checkbox .cbx:hover {
+  background: rgba(99, 99, 99, 0.06);
+}
+.no-winner-checkbox .cbx span {
+  float: left;
+  vertical-align: middle;
+  transform: translate3d(0, 0, 0);
+}
+.no-winner-checkbox .cbx span:first-child {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  transform: scale(1);
+  border: 1px solid #cccfdb;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 1px rgba(0, 16, 75, 0.05);
+}
+.no-winner-checkbox .cbx span:first-child svg {
+  position: absolute;
+  top: 3px;
+  left: 2px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 16px;
+  stroke-dashoffset: 16px;
+  transition: all 0.3s ease;
+  transition-delay: 0.1s;
+  transform: translate3d(0, 0, 0);
+}
+.no-winner-checkbox .cbx span:last-child {
+  padding-left: 8px;
+  line-height: 18px;
+}
+.no-winner-checkbox .cbx:hover span:first-child {
+  border-color: #07f;
+}
+.no-winner-checkbox .inp-cbx {
+  position: absolute;
+  visibility: hidden;
+}
+.no-winner-checkbox .inp-cbx:checked + .cbx span:first-child {
+  background: #07f;
+  border-color: #07f;
+  animation: wave-4 0.4s ease;
+}
+.no-winner-checkbox .inp-cbx:checked + .cbx span:first-child svg {
+  stroke-dashoffset: 0;
+}
+.no-winner-checkbox .inline-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Container for players' list */
+#players-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.player-box {
+  background: #1e1e1e;
+  border: 2px solid;
+  border-radius: 16px;
+  padding: 4px 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.8rem;
+}
+.player-box .name {
+  margin-right: 8px;
+}
+.player-box .remove {
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+
+
+
+
+/* Scores table base */
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  background: #1e1e1e;
+  color: white;
+}
+
+/* Header cells: background injected inline */
+.score-table th {
+  padding: 8px;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+/* Data cells: inputs stretch full width */
+#scores-container {
+  align-items: center;       /* vertical centering */
+  gap: 16px;
+}
+
+.score-table td {
+  padding: 4px;
+}
+.score-table td input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent; /* will color-bottom inline */
+  color: white;
+  text-align: center;
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+
+/* Table controls styling */
+.table-controls {
+  display: flex;
+  justify-content: center;    /* center the buttons in the column */
+  gap: 8px;    
+  margin-top: 10px;
+}
+.table-controls button {
+  background: transparent;
+  border: 2px solid #333333;
+  color: #333333;
+  padding: 4px 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.table-controls button:hover {
+  background: #333333;
+  color: #1e1e1e;
+}
+
+
+
+
+
+
+
+/* Submit button */
+#btn-submit {
+  background: transparent;
+  border: 2px solid #7ad069;
+  color: #7ad069;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+#btn-submit:hover {
+  background: #7ad069;
+  color: #161616;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media screen and (max-width: 640px) {
+  .no-winner-checkbox .cbx {
+    width: 100%;
+    display: inline-block;
+  }
+}
+@-moz-keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}
+@-webkit-keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}
+@-o-keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}
+@keyframes wave-4 {
+  50% {
+    transform: scale(0.9);
+  }
+}

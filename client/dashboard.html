@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+
+    <!-- shared styles -->
+    <link rel="stylesheet" href="css/main.css" />
+    <!-- dashboard‑specific styles -->
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <header>
+      <button id="btn-loggear" class="log-toggle">+</button>
+    </header>
+
+    <section id="log-form-container" class="log-form-container hidden">
+      <form id="log-form">
+        <h2>Nueva Partida</h2>
+
+        <select id="game-select" class="input-log-box">
+          <option value="">-- Seleccionar --</option>
+          <option>Azul</option>
+          <option>Erudito</option>
+          <option>Flip 7</option>
+          <option>Heat</option>
+          <option>Jodete</option>
+        </select>
+
+        <!-- Date played input -->
+        <input type="date" id="date-played" class="input-log-box" />
+
+        <!-- No winners checkbox -->
+        <div class="no-winner-checkbox">
+          <input class="inp-cbx" id="no-winner-cbx" type="checkbox" />
+          <label class="cbx" for="no-winner-cbx">
+            <span>
+              <svg width="12px" height="10px">
+                <use xlink:href="#check-4"></use>
+              </svg>
+            </span>
+            <span>Sin ganador</span>
+          </label>
+          <svg class="inline-svg">
+            <symbol id="check-4" viewbox="0 0 12 10">
+              <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+            </symbol>
+          </svg>
+        </div>
+
+        <!-- Players input and list-->
+        <input
+          type="text"
+          id="players-enter"
+          class="input-log-box"
+          placeholder="Jugadores"
+        />
+        <div id="players-container"></div>
+
+        <!-- Points table -->
+        <div id="scores-container">
+          <table id="scores-table" class="score-table">
+            <thead>
+              <tr id="scores-header"></tr>
+            </thead>
+            <tbody id="scores-body"></tbody>
+          </table>
+          <div class="table-controls">
+            <button type="button" id="add-row">↓</button>
+            <button type="button" id="remove-row">↑</button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit">Enviar</button>
+      </form>
+    </section>
+
+    <!-- Stats hub -->
+
+    <!-- Firebase compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <!-- Firebase init / auth protection -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+
+    <!-- Dashboard logic -->
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

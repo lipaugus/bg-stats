@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/login_page.css">
+</head>
+<body>
+  <div id="login-container">
+    <h1>Login</h1>
+    <input id="email" type="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Contraseña">
+    <label>
+      <input id="remember" type="checkbox">
+      Recordame
+    </label>
+    <button id="btn-login">Login</button>
+    <p id="error-msg" class="error"></p>
+  </div>
+
+  <!-- 1. Load Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+  <!-- 2. Initialize Firebase -->
+  <script src="js/firebase-config.js"></script>
+
+  <!-- 3. Auth logic -->
+  <script src="js/auth.js"></script>
+</body>
+</html>
