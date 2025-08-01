@@ -218,7 +218,7 @@ logForm.addEventListener('submit', e => {
   };
 
   // 1) Log it in mongodb
-fetch('/api/log', {
+fetch('/log', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(payload)
@@ -249,7 +249,6 @@ fetch('/api/log', {
     console.error('Error saving log:', err);
     alert('Error saving your log, see console.');
   });
-
 
   // 2) Close & reset the form UI
   formContainer.classList.remove('visible');

@@ -79,5 +79,18 @@ app.post('/api/logs', authMiddleware, async (req, res) => {
   }
 })
 
+app.post('/log', async (req, res) => {
+  try {
+    const payload = req.body;
+    // Save to a generic collection for compatibility with Cloudflare
+    const LogGeneric = mongoose.model('LogGeneric', new mongoose.Schema({}, { strict: false }), 'mainLogs');
+    await LogGeneric.create(payload);
+    res.status(201).json({ message: 'Logged successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to save log' });
+  }
+});
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`))
