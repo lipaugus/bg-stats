@@ -12,12 +12,33 @@ export default async function handler(req, res) {
     return;
   }
 
+  let payload;
+  try {
+    payload = req.body;
+    // If payload is undefined, parse manually
+    if (!payload || typeof payload !== 'object') {
+      payload = await new Promise((resolve, reject) => {
+        let data = '';
+        req.on('data', chunk => { data += chunk; });
+        req.on('end', () => {
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    }
+  } catch (err) {
+    res.status(400).send('Invalid JSON');
+    return;
+  }
+
   const client = new MongoClient(uri);
   try {
     await client.connect();
     const db = client.db('data');
     const col = db.collection('mainLogs');
-    const payload = req.body;
     await col.insertOne(payload);
     res.status(200).json({ success: true });
   } catch (err) {
