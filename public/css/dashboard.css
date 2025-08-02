@@ -331,6 +331,53 @@ input[type=number] {
     width: 100%;
     display: inline-block;
   }
+
+   /* 1) Smaller, fixed toggle button in corner */
+  #btn-loggear {
+    width: 40px;
+    height: 40px;
+    bottom: 12px;
+    right: 12px;
+    font-size: 20px;
+  }
+
+  /* 2) Full-screen overlay for the form */
+  #log-form-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 2000; /* sit above everything */
+  }
+
+  /* 3) Scale down the form itself */
+  #log-form {
+    width: 100%;
+    max-width: 360px;
+    padding: 16px;
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+
+  /* 4) Smaller inputs & buttons */
+  .input-log-box,
+  #scores-container input,
+  .table-controls button,
+  #btn-submit {
+    font-size: 0.8rem;
+  }
+
+  /* 5) Shrink table header text */
+  .score-table th {
+    font-size: 0.8rem;
+    padding: 6px;
+  }
 }
 @-moz-keyframes wave-4 {
   50% {
