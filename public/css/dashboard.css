@@ -243,6 +243,7 @@ input[type=number] {
   padding: 8px;
   text-transform: uppercase;
   font-size: 0.9rem;
+  border-radius: 0 !important;
 }
 
 /* Data cells: inputs stretch full width */
@@ -253,6 +254,7 @@ input[type=number] {
 
 .score-table td {
   padding: 4px;
+  border-radius: 0 !important;
 }
 .score-table td input {
   width: 100%;
@@ -263,6 +265,7 @@ input[type=number] {
   text-align: center;
   padding: 4px 0;
   font-size: 0.9rem;
+  border-radius: 0 !important;
 }
 
 /* Table controls styling */
