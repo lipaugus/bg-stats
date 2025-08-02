@@ -102,16 +102,9 @@ input[type=number] {
   padding: 7px;
   border: 0;
   border-bottom: 1px solid white;
-}
-
-/* Force input boxes to have no border radius */
-.input-log-box,
-.input-log-box:focus,
-.input-log-box:active,
-input,
-select {
   border-radius: 0 !important;
 }
+
 
 
 /* Remove dropdown arrow from game select box */
@@ -332,6 +325,61 @@ select {
 
 
 
+@media screen and (max-width: 640px) {
+  /* 1) Pin the toggle button smaller in the corner */
+  button#btn-loggear {
+    position: fixed !important;
+    bottom: 12px !important;
+    right: 12px !important;
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 20px !important;
+    padding: 0 !important;
+  }
+
+  /* 2) When visible, force the form container full-screen */
+  #log-form-container.visible {
+    display: flex !important;            /* override the .hidden display:none */
+    flex-direction: column;              /* center its contents */
+    align-items: center;
+    justify-content: center;
+    position: fixed !important;
+    top: 0 !important; 
+    left: 0 !important; 
+    right: 0 !important; 
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    padding: 16px !important;
+    background: rgba(0,0,0,0.85) !important;
+    opacity: 1 !important;               /* override any opacity animation */
+    transform: translateY(0) !important; /* override any translate */
+    pointer-events: auto !important;
+    z-index: 2000 !important;
+  }
+
+  /* 3) Shrink & center the inner form */
+  #log-form {
+    width: 100% !important;
+    max-width: 360px !important;
+    padding: 16px !important;
+    gap: 12px !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* 4) Smaller inputs, table, buttons */
+  .input-log-box,
+  #scores-container input,
+  .table-controls button,
+  #btn-submit {
+    font-size: 0.8rem !important;
+  }
+
+  .score-table th {
+    font-size: 0.8rem !important;
+    padding: 6px !important;
+  }
+}
 
 
 
@@ -340,42 +388,6 @@ select {
   .no-winner-checkbox .cbx {
     width: 100%;
     display: inline-block;
-  }
-  
-  /* Log toggle button: smaller and always fixed */
-  #btn-loggear {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-    bottom: 12px;
-    right: 12px;
-    padding: 0;
-  }
-
-  /* Log form container: full screen overlay */
-  #log-form-container,
-  .log-form-container {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100vw !important;
-    height: 100vh !important;
-    background: #161616ee;
-    z-index: 2000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  #log-form {
-    max-width: 95vw;
-    width: 100vw;
-    border-radius: 0 !important;
-    min-height: 80vh;
-    margin: 0;
-    padding: 16px;
   }
 }
 @-moz-keyframes wave-4 {
