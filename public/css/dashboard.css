@@ -313,6 +313,36 @@ input[type=number] {
 
 
 
+/* Toast popup for successful save in mongodb */
+/* Toast notification */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 4000;
+  font-size: 0.9rem;
+}
+
+.toast .close-toast {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+
+
+
 
 
 

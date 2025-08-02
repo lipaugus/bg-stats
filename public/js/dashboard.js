@@ -155,6 +155,26 @@ function renderPlayers() {
     renderScoresTable();
 }
 
+// Helper to show a temporary, closable toast
+function showToast(message, duration = 3000) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = message;
+
+  const btn = document.createElement('button');
+  btn.className = 'close-toast';
+  btn.innerHTML = '&times;';
+  btn.addEventListener('click', () => {
+    toast.remove();
+  });
+  toast.appendChild(btn);
+
+  document.body.appendChild(toast);
+
+  // auto-remove after duration
+  setTimeout(() => toast.remove(), duration);
+}
+
 // Handle Enter on player input
 playerInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
@@ -205,69 +225,70 @@ renderPlayers();
 // Handle form submission
 const logForm = document.getElementById('log-form');
 logForm.addEventListener('submit', e => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Build the payload
-  const payload = {
-    date:    dateInput.value,          // YYYY-MM-DD
-    game:    gameInput.value,
-    players: [...players],
-    winners: [...winnersList],
-    points:  { ...points },
-    rounds:  rowCount
-  };
+    // Build the payload
+    const payload = {
+        date: dateInput.value,          // YYYY-MM-DD
+        game: gameInput.value,
+        players: [...players],
+        winners: [...winnersList],
+        points: { ...points },
+        rounds: rowCount
+    };
 
-  // 1) Log it in mongodb
-fetch('/api/log', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(payload)
-})
-  .then(res => {
-    if (!res.ok) throw new Error(res.statusText);
-    return res.json();
-  })
-  .then(json => {
-    console.log('Saved to Mongo:', json);
+    // 1) Log it in mongodb
+    fetch('/api/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(res => {
+            if (!res.ok) throw new Error(res.statusText);
+            return res.json();
+        })
+        .then(json => {
+            showToast('Partida guardada!');
+            console.log('Saved to Mongo:', json);
 
-    // then your existing cleanup code…
+            // then your existing cleanup code…
+            formContainer.classList.remove('visible');
+            formContainer.classList.add('hidden');
+            btnLog.classList.remove('active');
+            btnLog.textContent = '+';
+            players = [];
+            winnersList = [];
+            points = {};
+            rowCount = 1;
+            gameInput.value = '';
+            dateInput.valueAsDate = new Date();
+            playerInput.value = '';
+            noWinnerCheckbox.checked = false;
+            renderPlayers();
+        })
+        .catch(err => {
+            console.error('Error saving log:', err);
+            alert('Error saving your log, see console.');
+        });
+
+    // 2) Close & reset the form UI
     formContainer.classList.remove('visible');
     formContainer.classList.add('hidden');
     btnLog.classList.remove('active');
     btnLog.textContent = '+';
+
+    // 3) Clear all in‐memory data so progress is reset
     players = [];
     winnersList = [];
     points = {};
     rowCount = 1;
+
+    // reset inputs
     gameInput.value = '';
     dateInput.valueAsDate = new Date();
     playerInput.value = '';
     noWinnerCheckbox.checked = false;
+
+    // re-render players & table with a single empty row
     renderPlayers();
-  })
-  .catch(err => {
-    console.error('Error saving log:', err);
-    alert('Error saving your log, see console.');
-  });
-
-  // 2) Close & reset the form UI
-  formContainer.classList.remove('visible');
-  formContainer.classList.add('hidden');
-  btnLog.classList.remove('active');
-  btnLog.textContent = '+';
-
-  // 3) Clear all in‐memory data so progress is reset
-  players     = [];
-  winnersList = [];
-  points      = {};
-  rowCount    = 1;
-
-  // reset inputs
-  gameInput.value        = '';
-  dateInput.valueAsDate  = new Date();
-  playerInput.value      = '';
-  noWinnerCheckbox.checked = false;
-
-  // re-render players & table with a single empty row
-  renderPlayers();
 });
