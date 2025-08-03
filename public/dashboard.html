@@ -9,7 +9,7 @@
     <!-- dashboard‑specific styles -->
     <link rel="stylesheet" href="css/dashboard.css" />
 
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
     <header>
@@ -20,20 +20,27 @@
       <form id="log-form">
         <h2>Nueva Partida</h2>
 
-        <select id="game-select" class="input-log-box">
-          <option value="">-- Seleccionar --</option>
-          <option>Azul</option>
-          <option>Erudito</option>
-          <option>Flip 7</option>
-          <option>Heat</option>
-          <option>Jodete</option>
-        </select>
+        <div style="position: relative; width: 100%">
+          <input
+            type="text"
+            id="game-select"
+            class="input-log-box"
+            placeholder="Juego"
+            autocomplete="off"
+          />
+          <ul id="game-select-list"></ul>
+        </div>
 
         <!-- Date played input -->
         <input type="date" id="date-played" class="input-log-box" />
 
         <!-- Duration input -->
-         <input type="number" id="duration-input" class="input-log-box" placeholder="Duración"/>
+        <input
+          type="number"
+          id="duration-input"
+          class="input-log-box"
+          placeholder="Duración"
+        />
 
         <!-- No winners checkbox -->
         <div class="no-winner-checkbox">
@@ -75,7 +82,6 @@
             <button type="button" id="remove-row">↑</button>
           </div>
         </div>
-
 
         <button type="submit" id="btn-submit">Enviar</button>
       </form>

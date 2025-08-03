@@ -1,6 +1,36 @@
+// List of games
+const games = [
+  "Akropolis",
+  "Atenea",
+  "Aventureros al Tren Europa",
+  "Azul",
+  "Camarero",
+  "Cinefilo",
+  "Derby",
+  "Dixit",
+  "Erudito",
+  "Estanciero",
+  "Flip 7",
+  "Heat",
+  "Ilustrado",
+  "Jardinero",
+  "Jodete",
+  "Kluster",
+  "Ludo",
+  "Macarena",
+  "Melomano",
+  "Retro Park",
+  "Sequence",
+  "Splendor",
+  "Switcher",
+  "The Mind",
+];
+
+
 // Get inputs & containers
 const formContainer = document.getElementById('log-form-container');
 const gameInput = document.getElementById('game-select');
+const gameList = document.getElementById('game-select-list');
 const dateInput = document.getElementById('date-played');
 const playerInput = document.getElementById('players-enter');
 const durationInput = document.getElementById('duration-input');
@@ -43,6 +73,38 @@ function darken(hex) {
         .slice(1);
 }
 
+// Standard Levenshtein distance helper funct
+function levenshtein(a, b) {
+    const dp = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+        let prev = i;
+        for (let j = 1; j <= b.length; j++) {
+            const temp = dp[j];
+            dp[j] = Math.min(
+                dp[j] + 1,
+                dp[j - 1] + 1,
+                prev + (a[i - 1] === b[j - 1] ? 0 : 1)
+            );
+            prev = temp;
+        }
+    }
+    return dp[b.length];
+}
+
+// Given the user’s input, compute up to N matches
+function getMatches(query) {
+    const s = query.trim().toLowerCase();
+    if (!s) return games.slice(0, 8);
+    return games
+        .map(g => ({ name: g, low: g.toLowerCase() }))
+        .filter(o =>
+            o.low.startsWith(s) ||
+            levenshtein(o.low, s) <= 1
+        )
+        .slice(0, 8)
+        .map(o => o.name);
+}
+
 // Update one box’s look based on selection
 function updateBoxStyle(box, color, selected) {
     if (selected) {
@@ -69,6 +131,51 @@ function syncPointsWithPlayers() {
         }
     });
 }
+
+
+
+
+// Render the dropdown list
+function renderList(items) {
+    gameList.innerHTML = '';
+    if (!items.length) {
+        gameList.style.display = 'none';
+        return;
+    }
+    for (const item of items) {
+        const li = document.createElement('li');
+        li.textContent = item;
+        li.style.padding = '0.25em 0.5em';
+        li.style.cursor = 'pointer';
+        li.addEventListener('mousedown', e => {
+            gameInput.value = item;
+            gameList.style.display = 'none';
+            e.preventDefault();
+        });
+        gameList.appendChild(li);
+    }
+    gameList.style.display = 'block';
+}
+
+
+// On input, filter games list
+gameInput.addEventListener('input', () => {
+    renderList(getMatches(gameInput.value));
+});
+
+// Always show full list on focus
+gameInput.addEventListener('focus', () => {
+    renderList(getMatches(gameInput.value));
+});
+
+// Hide shortly after blur
+gameInput.addEventListener('blur', () => {
+    setTimeout(() => gameList.style.display = 'none', 100);
+});
+
+
+
+
 
 // Render the scores table
 function renderScoresTable() {
@@ -158,22 +265,22 @@ function renderPlayers() {
 
 // Helper to show a temporary, closable toast
 function showToast(message, duration = 3000) {
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = message;
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
 
-  const btn = document.createElement('button');
-  btn.className = 'close-toast';
-  btn.innerHTML = '&times;';
-  btn.addEventListener('click', () => {
-    toast.remove();
-  });
-  toast.appendChild(btn);
+    const btn = document.createElement('button');
+    btn.className = 'close-toast';
+    btn.innerHTML = '&times;';
+    btn.addEventListener('click', () => {
+        toast.remove();
+    });
+    toast.appendChild(btn);
 
-  document.body.appendChild(toast);
+    document.body.appendChild(toast);
 
-  // auto-remove after duration
-  setTimeout(() => toast.remove(), duration);
+    // auto-remove after duration
+    setTimeout(() => toast.remove(), duration);
 }
 
 // Handle Enter on player input
