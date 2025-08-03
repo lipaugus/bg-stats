@@ -3,6 +3,7 @@ const formContainer = document.getElementById('log-form-container');
 const gameInput = document.getElementById('game-select');
 const dateInput = document.getElementById('date-played');
 const playerInput = document.getElementById('players-enter');
+const durationInput = document.getElementById('duration-input');
 const playersContainer = document.getElementById('players-container');
 const noWinnerCheckbox = document.getElementById('no-winner-cbx');
 const btnLog = document.getElementById('btn-loggear');
@@ -234,7 +235,8 @@ logForm.addEventListener('submit', e => {
         players: [...players],
         winners: [...winnersList],
         points: { ...points },
-        rounds: rowCount
+        rounds: rowCount,
+        duration: durationInput.value
     };
 
     // 1) Log it in mongodb
@@ -261,6 +263,7 @@ logForm.addEventListener('submit', e => {
             points = {};
             rowCount = 1;
             gameInput.value = '';
+            durationInput.value = '';
             dateInput.valueAsDate = new Date();
             playerInput.value = '';
             noWinnerCheckbox.checked = false;
@@ -285,6 +288,7 @@ logForm.addEventListener('submit', e => {
 
     // reset inputs
     gameInput.value = '';
+    durationInput.value = '';
     dateInput.valueAsDate = new Date();
     playerInput.value = '';
     noWinnerCheckbox.checked = false;
