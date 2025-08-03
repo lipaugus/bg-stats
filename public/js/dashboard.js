@@ -1,39 +1,42 @@
 // List of games
 const games = [
-  "Akropolis",
-  "Atenea",
-  "Aventureros al Tren Europa",
-  "Azul",
-  "Camarero",
-  "Cinefilo",
-  "Derby",
-  "Dixit",
-  "Erudito",
-  "Estanciero",
-  "Flip 7",
-  "Heat",
-  "Ilustrado",
-  "Jardinero",
-  "Jodete",
-  "Kluster",
-  "Ludo",
-  "Macarena",
-  "Melomano",
-  "Retro Park",
-  "Sequence",
-  "Splendor",
-  "Switcher",
-  "The Mind",
+    "Akropolis",
+    "Atenea",
+    "Aventureros al Tren Europa",
+    "Azul",
+    "Camarero",
+    "Cinefilo",
+    "Derby",
+    "Dixit",
+    "Erudito",
+    "Estanciero",
+    "Flip 7",
+    "Heat",
+    "Ilustrado",
+    "Jardinero",
+    "Jodete",
+    "Kluster",
+    "Ludo",
+    "Macarena",
+    "Melomano",
+    "Retro Park",
+    "Sequence",
+    "Splendor",
+    "Switcher",
+    "The Mind",
 ];
 
+// Only these games allow a points-limit
+const gamesWithPointLimits = ["Jodete"];
 
 // Get inputs & containers
 const formContainer = document.getElementById('log-form-container');
 const gameInput = document.getElementById('game-select');
 const gameList = document.getElementById('game-select-list');
 const dateInput = document.getElementById('date-played');
-const playerInput = document.getElementById('players-enter');
 const durationInput = document.getElementById('duration-input');
+const ptsLimitInput = document.getElementById('pts-limit-input');
+const playerInput = document.getElementById('players-enter');
 const playersContainer = document.getElementById('players-container');
 const noWinnerCheckbox = document.getElementById('no-winner-cbx');
 const btnLog = document.getElementById('btn-loggear');
@@ -47,11 +50,14 @@ const removeRowBtn = document.getElementById('remove-row');
 // Default date to today
 dateInput.valueAsDate = new Date();
 
+// Hide pts-limit on load
+ptsLimitInput.style.display = 'none';
+
 // State
 let players = [];
 let winnersList = [];
-let points = {};     // { playerName: [row0, row1, ...], … }
-let rowCount = 1;      // always keep at least one data row
+let points = {};  // { playerName: [row0, …], … }
+let rowCount = 1;
 
 // Color palette
 const palette = [
@@ -59,7 +65,62 @@ const palette = [
     '#c38d9e', '#41b3a3', '#6d597a'
 ];
 
-// Darken hex color by 40%
+// Levenshtein distance for fuzzy match
+function levenshtein(a, b) {
+    const dp = Array(b.length + 1).fill(0).map((_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+        let prev = i;
+        for (let j = 1; j <= b.length; j++) {
+            const temp = dp[j];
+            dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+            prev = temp;
+        }
+    }
+    return dp[b.length];
+}
+
+// Fuzzy matches (up to 8), return full list when empty
+function getMatches(query) {
+    const s = query.trim().toLowerCase();
+    if (!s) return games;
+    return games
+        .map(g => ({ name: g, low: g.toLowerCase() }))
+        .filter(o => o.low.startsWith(s) || levenshtein(o.low, s) <= 1)
+        .slice(0, 8)
+        .map(o => o.name);
+}
+
+// Render dropdown list
+function renderList(items) {
+    gameList.innerHTML = '';
+    if (!items.length) { gameList.style.display = 'none'; return; }
+    items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        li.style.padding = '0.25em 0.5em';
+        li.style.cursor = 'pointer';
+        li.addEventListener('mousedown', e => {
+            e.preventDefault();
+            gameInput.value = item;
+            gameList.style.display = 'none';
+            togglePtsLimit();
+        });
+        gameList.appendChild(li);
+    });
+    gameList.style.display = 'block';
+}
+
+// Show/hide pts-limit based on selected game
+function togglePtsLimit() {
+    if (gamesWithPointLimits.includes(gameInput.value)) {
+        ptsLimitInput.style.display = '';
+    } else {
+        ptsLimitInput.style.display = 'none';
+        ptsLimitInput.value = '';
+    }
+}
+
+// Darken hex by 40%
 function darken(hex) {
     let num = parseInt(hex.slice(1), 16),
         r = (num >> 16) & 0xff,
@@ -68,131 +129,44 @@ function darken(hex) {
     r = Math.floor(r * 0.6);
     g = Math.floor(g * 0.6);
     b = Math.floor(b * 0.6);
-    return '#' + ((1 << 24) | (r << 16) | (g << 8) | b)
-        .toString(16)
-        .slice(1);
+    return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
 }
 
-// Standard Levenshtein distance helper funct
-function levenshtein(a, b) {
-    const dp = Array.from({ length: b.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= a.length; i++) {
-        let prev = i;
-        for (let j = 1; j <= b.length; j++) {
-            const temp = dp[j];
-            dp[j] = Math.min(
-                dp[j] + 1,
-                dp[j - 1] + 1,
-                prev + (a[i - 1] === b[j - 1] ? 0 : 1)
-            );
-            prev = temp;
-        }
-    }
-    return dp[b.length];
-}
-
-// Given the user’s input, compute up to N matches
-function getMatches(query) {
-    const s = query.trim().toLowerCase();
-    if (!s) return games.slice(0, 8);
-    return games
-        .map(g => ({ name: g, low: g.toLowerCase() }))
-        .filter(o =>
-            o.low.startsWith(s) ||
-            levenshtein(o.low, s) <= 1
-        )
-        .slice(0, 8)
-        .map(o => o.name);
-}
-
-// Update one box’s look based on selection
+// Style player box
 function updateBoxStyle(box, color, selected) {
     if (selected) {
         box.style.background = color;
-        box.style.color = darken(color);
+        box.style.color = '#161616';
     } else {
         box.style.background = '#161616';
         box.style.color = color;
     }
 }
 
-// Sync points object keys with current players[]
+// Keep points keys in sync with players[]
 function syncPointsWithPlayers() {
-    // add new players
     players.forEach(name => {
-        if (!points[name]) {
-            points[name] = Array(rowCount).fill('');
-        }
+        if (!points[name]) points[name] = Array(rowCount).fill('');
     });
-    // remove old players
     Object.keys(points).forEach(name => {
-        if (!players.includes(name)) {
-            delete points[name];
-        }
+        if (!players.includes(name)) delete points[name];
     });
 }
-
-
-
-
-// Render the dropdown list
-function renderList(items) {
-    gameList.innerHTML = '';
-    if (!items.length) {
-        gameList.style.display = 'none';
-        return;
-    }
-    for (const item of items) {
-        const li = document.createElement('li');
-        li.textContent = item;
-        li.style.padding = '0.25em 0.5em';
-        li.style.cursor = 'pointer';
-        li.addEventListener('mousedown', e => {
-            gameInput.value = item;
-            gameList.style.display = 'none';
-            e.preventDefault();
-        });
-        gameList.appendChild(li);
-    }
-    gameList.style.display = 'block';
-}
-
-
-// On input, filter games list
-gameInput.addEventListener('input', () => {
-    renderList(getMatches(gameInput.value));
-});
-
-// Always show full list on focus
-gameInput.addEventListener('focus', () => {
-    renderList(getMatches(gameInput.value));
-});
-
-// Hide shortly after blur
-gameInput.addEventListener('blur', () => {
-    setTimeout(() => gameList.style.display = 'none', 100);
-});
-
-
-
-
 
 // Render the scores table
 function renderScoresTable() {
     syncPointsWithPlayers();
-
-    // HEADER
+    // header
     scoresHeader.innerHTML = '';
     players.forEach((name, i) => {
         const th = document.createElement('th');
         th.textContent = name.slice(0, 2);
         const color = palette[i % palette.length];
         th.style.background = color;
-        th.style.color = darken(color);
+        th.style.color = '#161616';
         scoresHeader.appendChild(th);
     });
-
-    // BODY
+    // body
     scoresBody.innerHTML = '';
     for (let r = 0; r < rowCount; r++) {
         const tr = document.createElement('tr');
@@ -202,9 +176,7 @@ function renderScoresTable() {
             inp.type = 'number';
             inp.value = points[name][r] ?? '';
             inp.style.borderBottom = `2px solid ${palette[i % palette.length]}`;
-            inp.addEventListener('input', () => {
-                points[name][r] = inp.value;
-            });
+            inp.addEventListener('input', () => { points[name][r] = inp.value });
             td.appendChild(inp);
             tr.appendChild(td);
         });
@@ -212,38 +184,26 @@ function renderScoresTable() {
     }
 }
 
-// Render the player-boxes and then the table
+// Render players & table
 function renderPlayers() {
     playersContainer.innerHTML = '';
-
     players.forEach((name, i) => {
         const color = palette[i % palette.length];
         const box = document.createElement('div');
         box.className = 'player-box';
         box.style.borderColor = color;
         updateBoxStyle(box, color, winnersList.includes(name));
-
-        // toggle winner
         box.addEventListener('click', () => {
             if (noWinnerCheckbox.checked) return;
             const idx = winnersList.indexOf(name);
-            if (idx > -1) {
-                winnersList.splice(idx, 1);
-                updateBoxStyle(box, color, false);
-            } else {
-                winnersList.push(name);
-                updateBoxStyle(box, color, true);
-            }
-            console.log('winnersList =', winnersList);
+            if (idx > -1) winnersList.splice(idx, 1);
+            else winnersList.push(name);
+            updateBoxStyle(box, color, idx === -1);
         });
-
-        // name label
         const spanName = document.createElement('span');
         spanName.className = 'name';
         spanName.textContent = name;
         box.appendChild(spanName);
-
-        // remove button
         const rem = document.createElement('span');
         rem.className = 'remove';
         rem.textContent = '×';
@@ -251,39 +211,36 @@ function renderPlayers() {
             e.stopPropagation();
             players = players.filter(p => p !== name);
             winnersList = winnersList.filter(p => p !== name);
-            console.log(`Deleted ${name}`, 'players =', players);
             renderPlayers();
         });
         box.appendChild(rem);
-
         playersContainer.appendChild(box);
     });
-
-    // after rebuilding players, rebuild table
     renderScoresTable();
 }
 
-// Helper to show a temporary, closable toast
-function showToast(message, duration = 3000) {
+// Toast notification
+function showToast(msg, duration = 3000) {
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.textContent = message;
-
+    toast.textContent = msg;
     const btn = document.createElement('button');
     btn.className = 'close-toast';
     btn.innerHTML = '&times;';
-    btn.addEventListener('click', () => {
-        toast.remove();
-    });
+    btn.onclick = () => toast.remove();
     toast.appendChild(btn);
-
     document.body.appendChild(toast);
-
-    // auto-remove after duration
     setTimeout(() => toast.remove(), duration);
 }
 
-// Handle Enter on player input
+// Event listeners
+gameInput.addEventListener('input', () => {
+    renderList(getMatches(gameInput.value));
+    togglePtsLimit();
+});
+gameInput.addEventListener('focus', () => renderList(games));
+gameInput.addEventListener('blur', () => setTimeout(() => gameList.style.display = 'none', 100));
+
 playerInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
         e.preventDefault();
@@ -296,110 +253,71 @@ playerInput.addEventListener('keydown', e => {
     }
 });
 
-// Handle “Sin ganador” checkbox
 noWinnerCheckbox.addEventListener('change', () => {
-    if (noWinnerCheckbox.checked) {
-        winnersList = [];
-        console.log('Sin ganador checked → winnersList cleared');
-    }
+    if (noWinnerCheckbox.checked) winnersList = [];
     renderPlayers();
 });
 
-// Toggle form visibility
 btnLog.addEventListener('click', () => {
-    const nowVisible = formContainer.classList.toggle('visible');
-    formContainer.classList.toggle('hidden', !nowVisible);
-    btnLog.classList.toggle('active', nowVisible);
-    btnLog.textContent = nowVisible ? '✖' : '+';
+    const now = formContainer.classList.toggle('visible');
+    formContainer.classList.toggle('hidden', !now);
+    btnLog.classList.toggle('active', now);
+    btnLog.textContent = now ? '✖' : '+';
 });
 
-// Add / remove data rows
 addRowBtn.addEventListener('click', () => {
     rowCount++;
-    Object.keys(points).forEach(name => points[name].push(''));
+    Object.keys(points).forEach(n => points[n].push(''));
     renderScoresTable();
 });
+
 removeRowBtn.addEventListener('click', () => {
     if (rowCount > 1) {
         rowCount--;
-        Object.keys(points).forEach(name => points[name].pop());
+        Object.keys(points).forEach(n => points[n].pop());
         renderScoresTable();
     }
 });
 
-// initial render
-renderPlayers();
-
-// Handle form submission
-const logForm = document.getElementById('log-form');
-logForm.addEventListener('submit', e => {
+document.getElementById('log-form').addEventListener('submit', e => {
     e.preventDefault();
-
-    // Build the payload
+    // clean points to int or null
+    const cleanedPoints = {};
+    Object.keys(points).forEach(name => {
+        cleanedPoints[name] = points[name].map(v => {
+            const i = parseInt(v);
+            return Number.isInteger(i) ? i : null;
+        });
+    });
+    const duration = (() => { const i = parseInt(durationInput.value); return Number.isInteger(i) ? i : null })();
+    let limit_points = (() => { const i = parseInt(ptsLimitInput.value); return Number.isInteger(i) ? i : null })();
+    if (!gamesWithPointLimits.includes(gameInput.value)) limit_points = null;
     const payload = {
-        date: dateInput.value,          // YYYY-MM-DD
+        date: dateInput.value,
         game: gameInput.value,
         players: [...players],
         winners: [...winnersList],
-        points: { ...points },
+        points: cleanedPoints,
         rounds: rowCount,
-        duration: durationInput.value
+        duration,
+        limit_points
     };
-
-    // 1) Log it in mongodb
+    console.log('Data:', payload);
     fetch('/api/log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-        .then(res => {
-            if (!res.ok) throw new Error(res.statusText);
-            return res.json();
-        })
+        .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
         .then(json => {
             showToast('Partida guardada!');
-            console.log('Saved to Mongo:', json);
-
-            // then your existing cleanup code…
-            formContainer.classList.remove('visible');
-            formContainer.classList.add('hidden');
-            btnLog.classList.remove('active');
-            btnLog.textContent = '+';
-            players = [];
-            winnersList = [];
-            points = {};
-            rowCount = 1;
-            gameInput.value = '';
-            durationInput.value = '';
-            dateInput.valueAsDate = new Date();
-            playerInput.value = '';
-            noWinnerCheckbox.checked = false;
-            renderPlayers();
+            btnLog.click(); // closes form and resets
         })
         .catch(err => {
-            console.error('Error saving log:', err);
-            alert('Error saving your log, see console.');
+            console.error(err);
+            alert('Error guardando, ver consola');
         });
-
-    // 2) Close & reset the form UI
-    formContainer.classList.remove('visible');
-    formContainer.classList.add('hidden');
-    btnLog.classList.remove('active');
-    btnLog.textContent = '+';
-
-    // 3) Clear all in‐memory data so progress is reset
-    players = [];
-    winnersList = [];
-    points = {};
-    rowCount = 1;
-
-    // reset inputs
-    gameInput.value = '';
-    durationInput.value = '';
-    dateInput.valueAsDate = new Date();
-    playerInput.value = '';
-    noWinnerCheckbox.checked = false;
-
-    // re-render players & table with a single empty row
-    renderPlayers();
 });
+
+// Initial render
+renderPlayers();
