@@ -367,8 +367,8 @@ input[type="number"] {
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100% !important;
+    height: 100% !important;
     padding: 16px !important;
     background: rgba(0, 0, 0, 0.85) !important;
     opacity: 1 !important; /* override any opacity animation */
