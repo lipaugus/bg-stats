@@ -280,44 +280,77 @@ removeRowBtn.addEventListener('click', () => {
 });
 
 document.getElementById('log-form').addEventListener('submit', e => {
-    e.preventDefault();
-    // clean points to int or null
-    const cleanedPoints = {};
-    Object.keys(points).forEach(name => {
-        cleanedPoints[name] = points[name].map(v => {
-            const i = parseInt(v);
-            return Number.isInteger(i) ? i : null;
-        });
+  e.preventDefault();
+  // clean points → int or null
+  const cleanedPoints = {};
+  Object.keys(points).forEach(name => {
+    cleanedPoints[name] = points[name].map(v => {
+      const i = parseInt(v);
+      return Number.isInteger(i) ? i : null;
     });
-    const duration = (() => { const i = parseInt(durationInput.value); return Number.isInteger(i) ? i : null })();
-    let limit_points = (() => { const i = parseInt(ptsLimitInput.value); return Number.isInteger(i) ? i : null })();
-    if (!gamesWithPointLimits.includes(gameInput.value)) limit_points = null;
-    const payload = {
-        date: dateInput.value,
-        game: gameInput.value,
-        players: [...players],
-        winners: [...winnersList],
-        points: cleanedPoints,
-        rounds: rowCount,
-        duration,
-        limit_points
-    };
-    console.log('Data:', payload);
-    fetch('/api/log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+  });
+  const duration = (() => {
+    const i = parseInt(durationInput.value);
+    return Number.isInteger(i) ? i : null;
+  })();
+  let limit_points = (() => {
+    const i = parseInt(ptsLimitInput.value);
+    return Number.isInteger(i) ? i : null;
+  })();
+  if (!gamesWithPointLimits.includes(gameInput.value)) limit_points = null;
+
+  const payload = {
+    date:         dateInput.value,
+    game:         gameInput.value,
+    players:      [...players],
+    winners:      [...winnersList],
+    points:       cleanedPoints,
+    rounds:       rowCount,
+    duration,
+    limit_points
+  };
+
+  fetch('/api/log', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+    .then(r => {
+      if (!r.ok) throw new Error(r.statusText);
+      return r.json();
     })
-        .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
-        .then(json => {
-            showToast('Partida guardada!');
-            btnLog.click(); // closes form and resets
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Error guardando, ver consola');
-        });
+    .then(json => {
+      showToast('Partida guardada!');
+      console.log('Saved:', json);
+
+      // ----- CLEANUP & RESET -----
+      // Close the form
+      btnLog.click();
+
+      // Reset state
+      players = [];
+      winnersList = [];
+      points = {};
+      rowCount = 1;
+
+      // Reset inputs
+      gameInput.value      = '';
+      durationInput.value  = '';
+      ptsLimitInput.value  = '';
+      dateInput.valueAsDate = new Date();
+      playerInput.value    = '';
+      noWinnerCheckbox.checked = false;
+      togglePtsLimit();   // hides pts-limit if needed
+
+      // Re-render empty UI
+      renderPlayers();
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error guardando, ver consola');
+    });
 });
+
 
 // Initial render
 renderPlayers();
