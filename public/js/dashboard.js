@@ -61,8 +61,14 @@ let rowCount = 1;
 
 // Color palette
 const palette = [
-    '#e27d60', '#85cdc4', '#e8a87c',
-    '#c38d9e', '#41b3a3', '#6d597a'
+    '#247897ff',
+    '#FF3838',
+    '#4FC653',
+    '#E9D758',
+    '#A96DA3',
+    '#8FCB9B',
+    '#FF8552',
+    '#EE4266'
 ];
 
 // Levenshtein distance for fuzzy match
