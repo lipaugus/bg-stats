@@ -61,14 +61,23 @@ let rowCount = 1;
 
 // Color palette
 const palette = [
-    '#247897ff',
-    '#FF3838',
-    '#4FC653',
-    '#E9D758',
-    '#A96DA3',
-    '#8FCB9B',
-    '#FF8552',
-    '#EE4266'
+    '#fa2c2c',
+    '#33FF57',
+    '#3357FF',
+    '#F5FF33',
+    '#A133FF',
+    '#33FFF5',
+    '#FF33A1',
+    '#FF8F33',
+    '#8FFF33',
+    '#808080',
+    '#dc6aff',
+    '#ff8787',
+    '#5e5bff',
+    '#67ff74',
+    '#ffeb7a',
+    '#ff95e5',
+    '#ffffff',
 ];
 
 // Levenshtein distance for fuzzy match
