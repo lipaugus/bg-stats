@@ -367,13 +367,19 @@ document.getElementById('log-form').addEventListener('submit', e => {
 });
 
 
-// Fetch existing logs
+import { renderMostPlayedStat } from './stats.js';
+
 async function fetchLogs() {
   try {
     const res = await fetch('/api/logs_extraction');
     if (!res.ok) throw new Error(res.statusText);
     extracted_logs = await res.json();
     console.log('Extracted logs:', extracted_logs);
+
+    // Render stats
+    const statsGrid = document.getElementById('stats-grid');
+    renderMostPlayedStat(extracted_logs, statsGrid);
+
   } catch (err) {
     console.error('Error fetching logs:', err);
   }

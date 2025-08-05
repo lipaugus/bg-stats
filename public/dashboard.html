@@ -6,8 +6,12 @@
 
     <!-- shared styles -->
     <link rel="stylesheet" href="css/main.css" />
+    
     <!-- dashboard‑specific styles -->
     <link rel="stylesheet" href="css/dashboard.css" />
+    
+    <!-- stat box styles -->
+    <link rel="stylesheet" href="css/stats.css" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
@@ -86,6 +90,7 @@
     </section>
 
     <!-- Stats hub -->
+    <div class="stats-grid" id="stats-grid"></div>
 
     <!-- Firebase compat SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -97,5 +102,8 @@
 
     <!-- Dashboard logic -->
     <script src="js/dashboard.js"></script>
+
+    <!-- Stat box logic -->
+    <script src="js/stats.js"></script>
   </body>
 </html>
