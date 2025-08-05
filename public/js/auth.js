@@ -12,7 +12,7 @@ btnLogin.addEventListener("click", async () => {
   errorMsg.textContent = "";
 
   try {
-    await auth.setPersistence(persistence);
+    // REMOVE persistence logic, just sign in
     await auth.signInWithEmailAndPassword(
       emailEl.value,
       passEl.value
