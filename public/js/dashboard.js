@@ -367,5 +367,18 @@ document.getElementById('log-form').addEventListener('submit', e => {
 });
 
 
+// Fetch existing logs
+async function fetchLogs() {
+  try {
+    const res = await fetch('/api/logs_extraction');
+    if (!res.ok) throw new Error(res.statusText);
+    extracted_logs = await res.json();
+    console.log('Extracted logs:', extracted_logs);
+  } catch (err) {
+    console.error('Error fetching logs:', err);
+  }
+}
+
+
 // Initial render
 renderPlayers();
