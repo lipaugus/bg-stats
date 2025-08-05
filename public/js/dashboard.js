@@ -41,6 +41,9 @@ const playersContainer = document.getElementById('players-container');
 const noWinnerCheckbox = document.getElementById('no-winner-cbx');
 const btnLog = document.getElementById('btn-loggear');
 
+// Set extracted_logs as global var
+let extracted_logs = [];
+
 // Table elements
 const scoresHeader = document.getElementById('scores-header');
 const scoresBody = document.getElementById('scores-body');
