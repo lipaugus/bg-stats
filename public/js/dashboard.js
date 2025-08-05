@@ -382,3 +382,6 @@ async function fetchLogs() {
 
 // Initial render
 renderPlayers();
+
+// Fetch logs from MongoDB when page loads
+fetchLogs();
