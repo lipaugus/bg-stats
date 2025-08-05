@@ -1,9 +1,9 @@
 .stats-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  margin: 32px auto;
-  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 32px; /* Padding from left border */
+  margin-top: 32px;
 }
 
 .stat-box {
@@ -12,8 +12,9 @@
   background: #181818;
   border-radius: 18px;
   box-shadow: 4px 4px 16px rgba(0,0,0,0.6);
-  padding: 24px;
+  padding: 24px 32px;
   min-height: 120px;
+  width: 420px; /* Increased width */
   transition: box-shadow 0.2s;
 }
 
@@ -31,28 +32,32 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 8px; /* Consistent spacing between lines */
 }
 
 .stat-title {
   font-size: 1.2rem;
   font-weight: bold;
   color: #fff;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .stat-toggle {
   background: none;
   border: none;
-  color: #7ad069;
-  font-size: 1.1rem;
+  color: #aaa; /* Grey color */
+  font-size: 1.2rem;
+  font-weight: bold;
   cursor: pointer;
-  padding: 0 6px;
+  padding: 0;
   border-radius: 6px;
   transition: background 0.2s;
+  font-family: inherit;
 }
+
 .stat-toggle:hover {
   background: #222;
 }
@@ -60,4 +65,11 @@
 .stat-value {
   font-size: 1.1rem;
   color: #ccc;
+  line-height: 1.4;
+}
+
+.stat-game-title {
+  font-style: italic;
+  color: #aaa;
+  margin-bottom: 0;
 }

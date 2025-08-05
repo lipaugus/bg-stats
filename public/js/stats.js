@@ -40,7 +40,8 @@ export function renderMostPlayedStat(logs, container) {
         <img src="${imgSrc}" alt="${stat.name}" onerror="this.src='images/default.png'">
         <div class="stat-box-content">
           <div class="stat-title">${title}</div>
-          <div class="stat-value">${stat.name}<br>${value}</div>
+          <div class="stat-game-title">${stat.name}</div>
+          <div class="stat-value">${value}</div>
         </div>
       </div>
     `;
