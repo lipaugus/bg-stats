@@ -65,39 +65,6 @@ export function renderWinsBarplot(logs, container) {
     new Set(logs.map(log => log.game))
   );
 
-  function createDropdown() {
-    const select = document.createElement("select");
-    select.className = "stat-dropdown";
-    const optionAll = document.createElement("option");
-    optionAll.value = "Todos";
-    optionAll.textContent = "Todos";
-    select.appendChild(optionAll);
-    allGames.forEach(game => {
-      const opt = document.createElement("option");
-      opt.value = game;
-      opt.textContent = game;
-      select.appendChild(opt);
-    });
-    select.value = selectedGame;
-    select.onchange = () => {
-      selectedGame = select.value;
-      update();
-    };
-    return select;
-  }
-
-  function createToggle() {
-    const btn = document.createElement("button");
-    btn.className = "stat-toggle";
-    btn.textContent = mode === "total" ? "total" : "porcentaje";
-    btn.onclick = (e) => {
-      e.preventDefault();
-      mode = mode === "total" ? "percentage" : "total";
-      update();
-    };
-    return btn;
-  }
-
   function getWinsData() {
     const filteredLogs = selectedGame === "Todos"
       ? logs
@@ -119,31 +86,40 @@ export function renderWinsBarplot(logs, container) {
       });
     });
 
-    return { wins, totalGames, filteredLogs };
-  }
-
-  function update() {
-    const { wins, totalGames } = getWinsData();
-
-    // For total: bars relative to max wins. For percentage: bars are % width.
-    let bars = "";
-    let maxValue = mode === "total"
-      ? Math.max(...Object.values(wins))
-      : 100;
-
-    allPlayers.forEach(player => {
+    // Prepare sortable array
+    const sortable = allPlayers.map(player => {
       const value = mode === "total"
         ? wins[player]
         : totalGames[player]
           ? (wins[player] / totalGames[player]) * 100
           : 0;
+      return { player, value, wins: wins[player], total: totalGames[player] };
+    });
+
+    // Sort descending by value
+    sortable.sort((a, b) => b.value - a.value);
+
+    return { sortable, wins, totalGames };
+  }
+
+  function update() {
+    const { sortable } = getWinsData();
+
+    // For total: bars relative to max wins. For percentage: bars are % width.
+    let maxValue = mode === "total"
+      ? Math.max(...sortable.map(s => s.value))
+      : 100;
+
+    // Build barplot HTML
+    let bars = "";
+    sortable.forEach(({ player, value, wins, total }) => {
       const label = mode === "total"
-        ? `${wins[player]}`
-        : totalGames[player]
+        ? `${wins}`
+        : total
           ? `${(value).toFixed(1)}%`
           : "0%";
       const barWidth = mode === "total"
-        ? (maxValue > 0 ? (wins[player] / maxValue) * 100 : 0)
+        ? (maxValue > 0 ? (value / maxValue) * 100 : 0)
         : value; // percentage mode: bar width is the percentage itself
       bars += `
         <div class="bar-row">
@@ -162,9 +138,7 @@ export function renderWinsBarplot(logs, container) {
           <div class="stat-title">
             Ganadores por <button class="stat-toggle">${mode === "total" ? "total" : "porcentaje"}</button>
           </div>
-          <div class="stat-barplot-controls">
-            ${createDropdown().outerHTML}
-          </div>
+          <div class="stat-barplot-controls"></div>
           <div class="barplot">
             ${bars}
           </div>
@@ -172,11 +146,34 @@ export function renderWinsBarplot(logs, container) {
       </div>
     `;
 
-    // Insert dropdown and toggle (replace HTML so need to re-attach events)
+    // Insert dropdown and toggle (with events and styles)
     const controls = container.querySelector('.stat-barplot-controls');
-    controls.innerHTML = "";
-    controls.appendChild(createDropdown());
-    // No label, dropdown only, slightly smaller
+    const dropdown = document.createElement("select");
+    dropdown.className = "stat-dropdown";
+    const optionAll = document.createElement("option");
+    optionAll.value = "Todos";
+    optionAll.textContent = "Todos";
+    dropdown.appendChild(optionAll);
+    allGames.forEach(game => {
+      const opt = document.createElement("option");
+      opt.value = game;
+      opt.textContent = game;
+      dropdown.appendChild(opt);
+    });
+    dropdown.value = selectedGame;
+    dropdown.onchange = () => {
+      selectedGame = dropdown.value;
+      update();
+    };
+    controls.appendChild(dropdown);
+
+    // Toggle button (already styled by .stat-toggle)
+    const toggleBtn = container.querySelector('.stat-toggle');
+    toggleBtn.onclick = (e) => {
+      e.preventDefault();
+      mode = mode === "total" ? "percentage" : "total";
+      update();
+    };
   }
 
   update();
