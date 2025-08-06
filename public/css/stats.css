@@ -73,3 +73,24 @@
   color: #aaa;
   margin-bottom: 0;
 }
+
+@media screen and (max-width: 640px) {
+  .stats-grid {
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .stat-box {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 16px 8px;
+    box-sizing: border-box;
+  }
+  .stat-box img {
+    width: 56px;
+    height: 56px;
+    margin-right: 12px;
+  }
+}
