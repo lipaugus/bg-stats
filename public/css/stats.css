@@ -227,6 +227,7 @@
     min-width: 0;
     max-width: 100%;
     padding: 16px 8px;
+    box-sizing: border-box;
   }
   .stat-barplot-controls {
     font-size: 0.92rem;
