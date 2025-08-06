@@ -135,10 +135,8 @@ export function renderWinsBarplot(logs, container) {
         <div class="stat-box-content" style="width:100%">
           <div class="stat-title">
             Ganadores por <button class="stat-toggle">${mode === "total" ? "total" : "porcentaje"}</button>
-            <span class="stat-dropdown-parenthesis">
-              (<select class="stat-dropdown"></select>)
-            </span>
           </div>
+          <div class="stat-barplot-controls"></div>
           <div class="barplot">
             ${bars}
           </div>
@@ -146,9 +144,10 @@ export function renderWinsBarplot(logs, container) {
       </div>
     `;
 
-    // Insert dropdown options and event
-    const dropdown = container.querySelector('.stat-dropdown');
-    dropdown.innerHTML = ""; // Clear
+    // Insert dropdown as subtitle
+    const controls = container.querySelector('.stat-barplot-controls');
+    const dropdown = document.createElement("select");
+    dropdown.className = "stat-dropdown";
     const optionAll = document.createElement("option");
     optionAll.value = "Todos";
     optionAll.textContent = "Todos los juegos";
@@ -164,6 +163,7 @@ export function renderWinsBarplot(logs, container) {
       selectedGame = dropdown.value;
       update();
     };
+    controls.appendChild(dropdown);
 
     // Toggle button event
     const toggleBtn = container.querySelector('.stat-toggle');

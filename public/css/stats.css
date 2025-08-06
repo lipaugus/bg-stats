@@ -87,12 +87,14 @@
   margin-bottom: 4px;
 }
 
+/* Subtitle controls below the title */
 .stat-barplot-controls {
   margin-bottom: 8px;
   display: flex;
   align-items: flex-start;
   gap: 0;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
+  color: #aaa;
 }
 
 .stat-barplot-controls .stat-dropdown {
@@ -174,7 +176,7 @@
   -moz-appearance: none;
   cursor: pointer;
   box-shadow: none;
-  margin: 0 0 0 2px;
+  margin: 0;
   border-radius: 4px;
   transition: background 0.2s;
   vertical-align: middle;
@@ -200,6 +202,7 @@
   margin: 0;
 }
 
+/* Responsive: make dropdown and controls fit mobile */
 @media screen and (max-width: 640px) {
   .stats-grid {
     padding-left: 8px;
@@ -225,9 +228,18 @@
     max-width: 100%;
     padding: 16px 8px;
   }
+  .stat-barplot-controls {
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+  }
   .stat-barplot-controls .stat-dropdown {
     font-size: 0.9rem;
     min-width: 60px;
+  }
+  .stat-dropdown {
+    font-size: 0.92rem;
+    min-width: 60px;
+    padding: 0 1px;
   }
   .bar-label {
     width: 56px;
