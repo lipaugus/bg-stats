@@ -370,7 +370,7 @@ document.getElementById('log-form').addEventListener('submit', e => {
 });
 
 
-import { renderMostPlayedStat } from './stats.js';
+import { renderMostPlayedStat, renderWinsBarplot } from './stats.js';
 
 async function fetchLogs() {
   try {
@@ -381,7 +381,13 @@ async function fetchLogs() {
 
     // Render stats
     const statsGrid = document.getElementById('stats-grid');
+    statsGrid.innerHTML = ""; // Clear previous
     renderMostPlayedStat(extracted_logs, statsGrid);
+
+    // Create a new div for the barplot
+    const barplotDiv = document.createElement('div');
+    statsGrid.appendChild(barplotDiv);
+    renderWinsBarplot(extracted_logs, barplotDiv);
 
   } catch (err) {
     console.error('Error fetching logs:', err);
