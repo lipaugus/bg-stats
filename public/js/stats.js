@@ -54,7 +54,6 @@ export function renderMostPlayedStat(logs, container) {
 }
 
 export function renderWinsBarplot(logs, container) {
-  // --- State ---
   let mode = "total"; // or "percentage"
   let selectedGame = "Todos";
 
@@ -66,7 +65,6 @@ export function renderWinsBarplot(logs, container) {
     new Set(logs.map(log => log.game))
   );
 
-  // --- UI Elements ---
   function createDropdown() {
     const select = document.createElement("select");
     select.className = "stat-dropdown";
@@ -92,21 +90,19 @@ export function renderWinsBarplot(logs, container) {
     const btn = document.createElement("button");
     btn.className = "stat-toggle";
     btn.textContent = mode === "total" ? "total" : "porcentaje";
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+      e.preventDefault();
       mode = mode === "total" ? "percentage" : "total";
       update();
     };
     return btn;
   }
 
-  // --- Calculate wins ---
   function getWinsData() {
-    // Filter logs by selected game
     const filteredLogs = selectedGame === "Todos"
       ? logs
       : logs.filter(log => log.game === selectedGame);
 
-    // Count wins per player
     const wins = {};
     allPlayers.forEach(p => wins[p] = 0);
     filteredLogs.forEach(log => {
@@ -115,7 +111,6 @@ export function renderWinsBarplot(logs, container) {
       });
     });
 
-    // For percentage, need total games played per player
     const totalGames = {};
     allPlayers.forEach(p => totalGames[p] = 0);
     filteredLogs.forEach(log => {
@@ -127,15 +122,15 @@ export function renderWinsBarplot(logs, container) {
     return { wins, totalGames, filteredLogs };
   }
 
-  // --- Render ---
   function update() {
-    const { wins, totalGames, filteredLogs } = getWinsData();
-    const maxValue = mode === "total"
-      ? Math.max(...Object.values(wins))
-      : Math.max(...allPlayers.map(p => totalGames[p] ? wins[p] / totalGames[p] : 0));
+    const { wins, totalGames } = getWinsData();
 
-    // Build barplot HTML
+    // For total: bars relative to max wins. For percentage: bars are % width.
     let bars = "";
+    let maxValue = mode === "total"
+      ? Math.max(...Object.values(wins))
+      : 100;
+
     allPlayers.forEach(player => {
       const value = mode === "total"
         ? wins[player]
@@ -147,12 +142,9 @@ export function renderWinsBarplot(logs, container) {
         : totalGames[player]
           ? `${(value).toFixed(1)}%`
           : "0%";
-      const barWidth = maxValue > 0
-        ? (mode === "total"
-            ? (wins[player] / maxValue) * 100
-            : (totalGames[player] ? (wins[player] / totalGames[player]) * 100 / maxValue * 100 : 0)
-          )
-        : 0;
+      const barWidth = mode === "total"
+        ? (maxValue > 0 ? (wins[player] / maxValue) * 100 : 0)
+        : value; // percentage mode: bar width is the percentage itself
       bars += `
         <div class="bar-row">
           <span class="bar-label">${player}</span>
@@ -168,11 +160,10 @@ export function renderWinsBarplot(logs, container) {
       <div class="stat-box stat-box-barplot">
         <div class="stat-box-content" style="width:100%">
           <div class="stat-title">
-            Ganadores por 
-            <span style="margin:0 4px"></span>
+            Ganadores por <button class="stat-toggle">${mode === "total" ? "total" : "porcentaje"}</button>
           </div>
           <div class="stat-barplot-controls">
-            <span>Juego:</span>
+            ${createDropdown().outerHTML}
           </div>
           <div class="barplot">
             ${bars}
@@ -181,11 +172,11 @@ export function renderWinsBarplot(logs, container) {
       </div>
     `;
 
-    // Insert dropdown and toggle
+    // Insert dropdown and toggle (replace HTML so need to re-attach events)
     const controls = container.querySelector('.stat-barplot-controls');
+    controls.innerHTML = "";
     controls.appendChild(createDropdown());
-    controls.appendChild(document.createTextNode(" | "));
-    controls.appendChild(createToggle());
+    // No label, dropdown only, slightly smaller
   }
 
   update();
