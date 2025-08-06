@@ -152,6 +152,54 @@
   flex-shrink: 0;
 }
 
+/* Parenthesis styling for dropdown */
+.stat-dropdown-parenthesis {
+  color: #888;
+  font-size: 1.05rem;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+/* Custom dropdown styling */
+.stat-dropdown {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.05rem;
+  font-family: inherit;
+  padding: 0 2px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  box-shadow: none;
+  margin: 0 0 0 2px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  vertical-align: middle;
+}
+
+.stat-dropdown:focus {
+  background: #222;
+  color: #fff;
+}
+
+.stat-dropdown option {
+  background: #181818;
+  color: #fff;
+}
+
+/* Remove dropdown arrow for Chrome/Safari/Edge */
+.stat-dropdown::-ms-expand {
+  display: none;
+}
+.stat-dropdown::-webkit-inner-spin-button,
+.stat-dropdown::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 @media screen and (max-width: 640px) {
   .stats-grid {
     padding-left: 8px;

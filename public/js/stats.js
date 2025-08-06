@@ -105,12 +105,10 @@ export function renderWinsBarplot(logs, container) {
   function update() {
     const { sortable } = getWinsData();
 
-    // For total: bars relative to max wins. For percentage: bars are % width.
     let maxValue = mode === "total"
       ? Math.max(...sortable.map(s => s.value))
       : 100;
 
-    // Build barplot HTML
     let bars = "";
     sortable.forEach(({ player, value, wins, total }) => {
       const label = mode === "total"
@@ -120,7 +118,7 @@ export function renderWinsBarplot(logs, container) {
           : "0%";
       const barWidth = mode === "total"
         ? (maxValue > 0 ? (value / maxValue) * 100 : 0)
-        : value; // percentage mode: bar width is the percentage itself
+        : value;
       bars += `
         <div class="bar-row">
           <span class="bar-label">${player}</span>
@@ -137,8 +135,10 @@ export function renderWinsBarplot(logs, container) {
         <div class="stat-box-content" style="width:100%">
           <div class="stat-title">
             Ganadores por <button class="stat-toggle">${mode === "total" ? "total" : "porcentaje"}</button>
+            <span class="stat-dropdown-parenthesis">
+              (<select class="stat-dropdown"></select>)
+            </span>
           </div>
-          <div class="stat-barplot-controls"></div>
           <div class="barplot">
             ${bars}
           </div>
@@ -146,13 +146,12 @@ export function renderWinsBarplot(logs, container) {
       </div>
     `;
 
-    // Insert dropdown and toggle (with events and styles)
-    const controls = container.querySelector('.stat-barplot-controls');
-    const dropdown = document.createElement("select");
-    dropdown.className = "stat-dropdown";
+    // Insert dropdown options and event
+    const dropdown = container.querySelector('.stat-dropdown');
+    dropdown.innerHTML = ""; // Clear
     const optionAll = document.createElement("option");
     optionAll.value = "Todos";
-    optionAll.textContent = "Todos";
+    optionAll.textContent = "Todos los juegos";
     dropdown.appendChild(optionAll);
     allGames.forEach(game => {
       const opt = document.createElement("option");
@@ -165,9 +164,8 @@ export function renderWinsBarplot(logs, container) {
       selectedGame = dropdown.value;
       update();
     };
-    controls.appendChild(dropdown);
 
-    // Toggle button (already styled by .stat-toggle)
+    // Toggle button event
     const toggleBtn = container.querySelector('.stat-toggle');
     toggleBtn.onclick = (e) => {
       e.preventDefault();
