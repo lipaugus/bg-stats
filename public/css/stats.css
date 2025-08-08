@@ -209,42 +209,25 @@
     padding-right: 10px;
     width: 100%;
     box-sizing: border-box;
+    align-items: stretch !important; /* Make children stretch full width */
   }
   .stat-box,
   .stat-box-barplot {
+    display: flex;
+    flex-direction: column;
     width: 100% !important;
     min-width: 0 !important;
     max-width: 100% !important;
-    /* Restore box padding for inner spacing */
     padding: 12px 12px !important;
     box-sizing: border-box;
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  .stat-box img {
-    width: 56px;
-    height: 56px;
-    margin-right: 12px;
+  .stat-box-content {
+    width: 100% !important;
+    box-sizing: border-box;
   }
-  .stat-barplot-controls {
-    font-size: 0.92rem;
-    margin-bottom: 6px;
-  }
-  .stat-barplot-controls .stat-dropdown {
-    font-size: 0.9rem;
-    min-width: 60px;
-  }
-  .stat-dropdown {
-    font-size: 0.92rem;
-    min-width: 60px;
-    padding: 0 1px;
-  }
-  .bar-label {
-    width: 56px;
-    font-size: 0.9rem;
-  }
-  .bar-value {
-    width: 36px;
-    font-size: 0.9rem;
+  .barplot {
+    width: 100% !important;
   }
 }
