@@ -378,21 +378,131 @@ async function fetchLogs() {
     if (!res.ok) throw new Error(res.statusText);
     extracted_logs = await res.json();
     console.log('Extracted logs:', extracted_logs);
-
-    // Render stats
-    const statsGrid = document.getElementById('stats-grid');
-    statsGrid.innerHTML = ""; // Clear previous
-    renderMostPlayedStat(extracted_logs, statsGrid);
-
-    // Create a new div for the barplot
-    const barplotDiv = document.createElement('div');
-    statsGrid.appendChild(barplotDiv);
-    renderWinsBarplot(extracted_logs, barplotDiv);
-
   } catch (err) {
-    console.error('Error fetching logs:', err);
+    // Use sample data if fetch fails (e.g., when running locally)
+    console.warn('Falling back to local sample data:', err);
+    extracted_logs = SAMPLE_LOGS;
+    console.log('Sample logs:', extracted_logs);
   }
+
+  // Render stats
+  const statsGrid = document.getElementById('stats-grid');
+  statsGrid.innerHTML = ""; // Clear previous
+
+  // Create separate containers for each stat box
+  const mostPlayedDiv = document.createElement('div');
+  const barplotDiv = document.createElement('div');
+  statsGrid.appendChild(mostPlayedDiv);
+  statsGrid.appendChild(barplotDiv);
+
+  renderMostPlayedStat(extracted_logs, mostPlayedDiv);
+  renderWinsBarplot(extracted_logs, barplotDiv);
 }
+
+
+// Sample data for local development (used if fetch fails)
+const SAMPLE_LOGS = [
+  {
+    date: "2025-08-03",
+    duration: 21,
+    game: "Jodete",
+    limit_points: 200,
+    players: ['Ariel', 'Lucas'],
+    points: { Ariel: [-10, -5, -15, 20, 10, 160, null], Lucas: [55, 45, 50, 40, 55, 45, 35] },
+    rounds: 7,
+    winners: ['Lucas'],
+    _id: "688f839e58af4aaf79437397"
+  },
+  {
+    date: "2025-08-04",
+    duration: 3,
+    game: "Kluster",
+    limit_points: 0,
+    players: ['Ariel', 'Lucas', 'Mica'],
+    points: { Ariel: [], Lucas: [], Mica: [] },
+    rounds: 1,
+    winners: ['Ariel'],
+    _id: "688f839e58af4aaf79437398"
+  },
+  {
+    date: "2025-08-05",
+    duration: 5,
+    game: "Kluster",
+    limit_points: 0,
+    players: ['Lucas', 'Ariel'],
+    points: { Lucas: [], Ariel: [] },
+    rounds: 1,
+    winners: ['Ariel'],
+    _id: "688f839e58af4aaf79437399"
+  },
+  {
+    date: "2025-08-05",
+    duration: 2,
+    game: "Kluster",
+    limit_points: 0,
+    players: ['Lucas', 'Mica'],
+    points: { Lucas: [], Mica: [] },
+    rounds: 1,
+    winners: ['Mica'],
+    _id: "688f839e58af4aaf79437399"
+  },
+  {
+    date: "2025-08-05",
+    duration: null,
+    game: "Kluster",
+    limit_points: 0,
+    players: ['Mica', 'Ariel'],
+    points: { Mica: [], Ariel: [] },
+    rounds: 1,
+    winners: ['Mica'],
+    _id: "688f839e58af4aaf79437399"
+  },
+  {
+    date: "2025-08-06",
+    duration: 15,
+    game: "Azul",
+    limit_points: 100,
+    players: ['Mica', 'Lucas', 'Ariel'],
+    points: { Mica: [10, 20, 15, 25], Lucas: [15, 25, 20, 30], Ariel: [12, 18, 22, 28] },
+    rounds: 4,
+    winners: ['Lucas'],
+    _id: "688f839e58af4aaf7943739a"
+  },
+  {
+    date: "2025-08-07",
+    duration: 12,
+    game: "Erudito",
+    limit_points: 300,
+    players: ['Lucas', 'Ariel'],
+    points: { Lucas: [50, 70, 80], Ariel: [40, 60, 90] },
+    rounds: 3,
+    winners: ['Ariel'],
+    _id: "688f839e58af4aaf7943739b"
+  },
+  {
+    date: "2025-08-08",
+    duration: 25,
+    game: "Aventureros",
+    limit_points: 0,
+    players: ['Mica', 'Lucas'],
+    points: { Mica: [45, 55, 65], Lucas: [50, 60, 70] },
+    rounds: 3,
+    winners: ['Lucas'],
+    _id: "688f839e58af4aaf7943739c"
+  },
+  {
+    date: "2025-08-09",
+    duration: 18,
+    game: "Jodete",
+    limit_points: 200,
+    players: ['Mica', 'Ariel'],
+    points: { Mica: [30, 50, 70, 90], Ariel: [40, 60, 80, 100] },
+    rounds: 4,
+    winners: ['Ariel'],
+    _id: "688f839e58af4aaf7943739d"
+  }
+];
+
 
 
 // Initial render

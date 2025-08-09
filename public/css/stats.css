@@ -8,13 +8,14 @@
 
 .stat-box {
   display: flex;
+  flex-direction: row;      /* Always row, even on mobile */
   align-items: center;
   background: #181818;
   border-radius: 18px;
   box-shadow: 4px 4px 16px rgba(0,0,0,0.6);
   padding: 24px 32px;
   min-height: 120px;
-  width: 420px; /* Increased width */
+  width: 420px;
   transition: box-shadow 0.2s;
 }
 
@@ -25,6 +26,7 @@
   border-radius: 12px;
   margin-right: 24px;
   background: #222;
+  flex-shrink: 0;
 }
 
 .stat-box-content {
@@ -106,11 +108,10 @@
 
 .barplot {
   width: 100%;
-  margin-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  align-items: flex-start; /* Justify chart to the left */
+  align-items: stretch; /* Ensures bars fill the width */
 }
 
 .bar-row {
@@ -118,6 +119,7 @@
   align-items: center;
   gap: 8px;
   width: 100%;
+  justify-content: flex-start; /* Left align */
 }
 
 .bar-label {
@@ -209,61 +211,55 @@
     padding-right: 10px;
     width: 100%;
     box-sizing: border-box;
-    align-items: stretch !important; /* Make children stretch full width */
+    align-items: stretch;
   }
-  .stat-box,
-  .stat-box-barplot {
-    display: flex;
-    flex-direction: column;
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    padding: 12px 12px !important;
-    box-sizing: border-box;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
+
+  /* First stat box - most played games */
   .stat-box {
-    flex-direction: column !important;
+    flex-direction: row !important;
     align-items: center !important;
-    text-align: center;
-    padding: 16px 8px !important;
+    text-align: left !important;
+    width: 100% !important;
+    padding: 12px 8px !important;
   }
+  
   .stat-box img {
-    margin: 0 0 12px 0 !important;
+    margin: 0 16px 0 0 !important;
     width: 56px !important;
     height: 56px !important;
   }
   .stat-box-content {
-    align-items: center !important;
-    gap: 6px !important;
+    align-items: flex-start !important;
     width: 100% !important;
     padding: 0 !important;
   }
-  .stat-title,
-  .stat-game-title,
+
+  /* Stat title and toggle in title */
+  .stat-title, .stat-toggle {
+    font-size: 15px;
+  }
+
+  .stat-game-title {
+    font-size: 10px;
+  }
   .stat-value {
-    text-align: center !important;
-    width: 100% !important;
+    font-size: 10px;
   }
+
+  /* Winners' stat box */
   .stat-box-barplot {
-    align-items: stretch !important;
-    padding: 16px 8px !important;
+    flex-direction: column;
+    width: 100%;
+    padding: 15px !important;
   }
-  .stat-box-barplot .stat-box-content {
-    align-items: stretch !important;
-    width: 100% !important;
-    padding: 0 !important;
+  .stat-dropdown {
+    font-size: 12px !important;
   }
-  .stat-title {
-    text-align: left !important;
-    width: 100% !important;
-    justify-content: flex-start !important;
+  .bar-value, .bar-label {
+    font-size: 10px !important;
   }
-  .stat-barplot-controls {
-    text-align: left !important;
-    width: 100% !important;
-    justify-content: flex-start !important;
+  .bar-bg {
+    height: 12px !important;
   }
   .barplot {
     align-items: stretch !important;
@@ -271,5 +267,6 @@
   }
   .bar-row {
     width: 100% !important;
+    justify-content: flex-start !important;
   }
 }
