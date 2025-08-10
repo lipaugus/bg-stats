@@ -85,6 +85,29 @@
           </div>
         </div>
 
+        <!-- F7 Mades container -->
+        <div id="f7-mades-container" class="f7-mades-container hidden">
+          <label class="f7-mades-label">F7 hechos</label>
+          <div class="f7-mades-input-row">
+            <input
+              type="text"
+              id="f7-player-input"
+              class="input-log-box"
+              placeholder="Jugador"
+              autocomplete="off"
+            />
+            <input
+              type="number"
+              id="f7-round-input"
+              class="input-log-box"
+              placeholder="Ronda"
+              min="1"
+            />
+            <button type="button" id="f7-add-btn" class="f7-add-btn">+</button>
+          </div>
+          <div id="f7-mades-list" class="f7-mades-list"></div>
+        </div>
+
         <button type="submit" id="btn-submit">Enviar</button>
       </form>
     </section>

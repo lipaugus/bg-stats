@@ -207,6 +207,7 @@ function renderPlayers() {
     playersContainer.innerHTML = '';
     players.forEach((name, i) => {
         const color = palette[i % palette.length];
+        window.playersColors[name] = color; // <-- Add this line
         const box = document.createElement('div');
         box.className = 'player-box';
         box.style.borderColor = color;
@@ -510,3 +511,98 @@ renderPlayers();
 
 // Fetch logs from MongoDB when page loads
 fetchLogs();
+
+// --- F7 hechos logic ---
+const f7Container = document.getElementById('f7-mades-container');
+const f7PlayerInput = document.getElementById('f7-player-input');
+const f7RoundInput = document.getElementById('f7-round-input');
+const f7AddBtn = document.getElementById('f7-add-btn');
+const f7List = document.getElementById('f7-mades-list');
+let f7Mades = [];
+
+// Helper: get player color (reuse your player color logic)
+function getPlayerColor(name) {
+  // Use the same color assignment as your players input
+  if (window.playersColors && window.playersColors[name]) {
+    return window.playersColors[name];
+  }
+  // fallback color
+  return "#fff";
+}
+
+function renderF7Mades() {
+  f7List.innerHTML = "";
+  f7Mades.forEach((entry, idx) => {
+    const [player, round] = entry.split("-");
+    const pill = document.createElement("span");
+    pill.className = "f7-pill";
+    const color = window.playersColors[player] || "#fff";
+    pill.style.borderColor = color;
+    pill.style.color = color;
+    pill.style.background = "transparent";
+    pill.style.fontSize = "1rem"; // Match player box font size
+    pill.style.fontFamily = "inherit";
+    pill.style.padding = "4px 12px";
+    pill.style.marginBottom = "4px";
+    pill.textContent = `${player}-${round}`;
+    // Delete button
+    const delBtn = document.createElement("button");
+    delBtn.className = "f7-pill-delete";
+    delBtn.innerHTML = "&times;";
+    delBtn.onclick = () => {
+      f7Mades.splice(idx, 1);
+      renderF7Mades();
+    };
+    pill.appendChild(delBtn);
+    f7List.appendChild(pill);
+  });
+}
+
+// Add F7 hecho
+function addF7Hecho() {
+  const player = f7PlayerInput.value.trim();
+  const round = f7RoundInput.value.trim();
+  if (!player || !round) return;
+  f7Mades.push(`${player}-${round}`);
+  renderF7Mades();
+  f7PlayerInput.value = "";
+  f7RoundInput.value = "";
+  f7PlayerInput.focus();
+}
+
+// Add on "+" button click
+f7AddBtn.addEventListener("click", addF7Hecho);
+// Add on Enter in either input
+[f7PlayerInput, f7RoundInput].forEach(input => {
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addF7Hecho();
+    }
+  });
+});
+
+// Show/hide F7 hechos based on game selection
+["input", "change"].forEach(evt =>
+  gameInput.addEventListener(evt, () => {
+    // Case-insensitive, trimmed check
+    if (gameInput.value.trim().toLowerCase() === "flip 7") {
+      f7Container.classList.remove("hidden");
+    } else {
+      f7Container.classList.add("hidden");
+      f7Mades = [];
+      renderF7Mades();
+    }
+  })
+);
+
+// --- On form submit, add f7_mades if needed ---
+document.getElementById('log-form').addEventListener('submit', e => {
+  // ...existing code to build payload...
+  if (gameInput.value.trim() === "Flip 7" && f7Mades.length > 0) {
+    payload.f7_mades = [...f7Mades];
+  }
+  // ...rest of submit logic...
+});
+
+window.playersColors = {}; // { "Lucas": "#7ad069", ... }
