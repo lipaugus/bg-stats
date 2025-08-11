@@ -6,10 +6,10 @@
 
     <!-- shared styles -->
     <link rel="stylesheet" href="css/main.css" />
-    
+
     <!-- dashboard‑specific styles -->
     <link rel="stylesheet" href="css/dashboard.css" />
-    
+
     <!-- stat box styles -->
     <link rel="stylesheet" href="css/stats.css" />
 
@@ -39,10 +39,21 @@
         <input type="date" id="date-played" class="input-log-box" />
 
         <!-- Duration input -->
-        <input type="number" id="duration-input" class="input-log-box" placeholder="Duración"/>
+        <input
+          type="number"
+          id="duration-input"
+          class="input-log-box"
+          placeholder="Duración"
+        />
 
         <!-- Points Limit -->
-        <input type="number" id="pts-limit-input" class="input-log-box" placeholder="Límite de Puntos" value="200"/>
+        <input
+          type="number"
+          id="pts-limit-input"
+          class="input-log-box"
+          placeholder="Límite de Puntos"
+          value="200"
+        />
 
         <!-- No winners checkbox -->
         <div class="no-winner-checkbox">
@@ -83,6 +94,12 @@
             <button type="button" id="add-row">↓</button>
             <button type="button" id="remove-row">↑</button>
           </div>
+        </div>
+
+        <!-- First-timers container (Jugadores primerizos) -->
+        <div id="first-timers-container" class="f7-mades-container">
+          <label class="f7-mades-label">Jugadores primerizos</label>
+          <div id="first-timers-list" class="f7-mades-list"></div>
         </div>
 
         <!-- F7 Mades container -->

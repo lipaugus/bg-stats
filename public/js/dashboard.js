@@ -61,6 +61,7 @@ let players = [];
 let winnersList = [];
 let points = {};  // { playerName: [row0, …], … }
 let rowCount = 1;
+let firstTimers = []; // players marked as "first time" for this game
 
 // Color palette
 const palette = [
@@ -82,6 +83,8 @@ const palette = [
     '#ff95e5',
     '#ffffff',
 ];
+
+window.playersColors = {}; // { "Lucas": "#7ad069", ... }
 
 // Levenshtein distance for fuzzy match
 function levenshtein(a, b) {
@@ -117,12 +120,29 @@ function renderList(items) {
         li.textContent = item;
         li.style.padding = '0.25em 0.5em';
         li.style.cursor = 'pointer';
+
+        // Use mousedown so the blur on input doesn't hide the list before click
         li.addEventListener('mousedown', e => {
             e.preventDefault();
             gameInput.value = item;
             gameList.style.display = 'none';
             togglePtsLimit();
+
+            // ensure other listeners react (important for mobile/touch selection)
+            gameInput.dispatchEvent(new Event('input', { bubbles: true }));
+            gameInput.dispatchEvent(new Event('change', { bubbles: true }));
         });
+
+        // Also support click (some touch setups)
+        li.addEventListener('click', e => {
+            e.preventDefault();
+            gameInput.value = item;
+            gameList.style.display = 'none';
+            togglePtsLimit();
+            gameInput.dispatchEvent(new Event('input', { bubbles: true }));
+            gameInput.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
         gameList.appendChild(li);
     });
     gameList.style.display = 'block';
@@ -207,22 +227,30 @@ function renderPlayers() {
     playersContainer.innerHTML = '';
     players.forEach((name, i) => {
         const color = palette[i % palette.length];
-        window.playersColors[name] = color; // <-- Add this line
+        window.playersColors[name] = color; // persist mapping for other components
         const box = document.createElement('div');
         box.className = 'player-box';
         box.style.borderColor = color;
-        updateBoxStyle(box, color, winnersList.includes(name));
+
+        // ensure visual state matches winnersList
+        const selected = winnersList.includes(name);
+        updateBoxStyle(box, color, selected);
+
         box.addEventListener('click', () => {
             if (noWinnerCheckbox.checked) return;
             const idx = winnersList.indexOf(name);
             if (idx > -1) winnersList.splice(idx, 1);
             else winnersList.push(name);
-            updateBoxStyle(box, color, idx === -1);
+            // update visual using the new state
+            const nowSelected = winnersList.includes(name);
+            updateBoxStyle(box, color, nowSelected);
         });
+
         const spanName = document.createElement('span');
         spanName.className = 'name';
         spanName.textContent = name;
         box.appendChild(spanName);
+
         const rem = document.createElement('span');
         rem.className = 'remove';
         rem.textContent = '×';
@@ -230,12 +258,15 @@ function renderPlayers() {
             e.stopPropagation();
             players = players.filter(p => p !== name);
             winnersList = winnersList.filter(p => p !== name);
+            // Keep firstTimers in sync
+            firstTimers = firstTimers.filter(p => p !== name);
             renderPlayers();
         });
         box.appendChild(rem);
         playersContainer.appendChild(box);
     });
     renderScoresTable();
+    renderFirstTimers();
 }
 
 // Toast notification
@@ -250,6 +281,52 @@ function showToast(msg, duration = 3000) {
     toast.appendChild(btn);
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), duration);
+}
+
+// --- First-timers UI ---
+function renderFirstTimers() {
+    const list = document.getElementById('first-timers-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    players.forEach(name => {
+        const pill = document.createElement('span');
+        pill.className = 'f7-pill';
+        const color = window.playersColors[name] || '#fff';
+
+        pill.style.borderColor = color;
+        pill.style.color = color;
+        pill.style.background = 'transparent';
+        pill.style.fontSize = '1rem';
+        pill.style.padding = '4px 12px';
+        pill.style.marginBottom = '4px';
+        pill.style.cursor = 'pointer';
+        pill.textContent = name;
+
+        // initial selected state
+        if (firstTimers.includes(name)) {
+            pill.style.background = color;
+            pill.style.color = '#161616';
+        }
+
+        pill.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = firstTimers.indexOf(name);
+            if (idx > -1) firstTimers.splice(idx, 1);
+            else firstTimers.push(name);
+
+            const selected = firstTimers.includes(name);
+            if (selected) {
+                pill.style.background = color;
+                pill.style.color = '#161616';
+            } else {
+                pill.style.background = 'transparent';
+                pill.style.color = color;
+            }
+        });
+
+        list.appendChild(pill);
+    });
 }
 
 // Event listeners
@@ -269,6 +346,7 @@ playerInput.addEventListener('keydown', e => {
             renderPlayers();
         }
         playerInput.value = '';
+        playerInput.focus();
     }
 });
 
@@ -298,106 +376,118 @@ removeRowBtn.addEventListener('click', () => {
     }
 });
 
-document.getElementById('log-form').addEventListener('submit', e => {
-  e.preventDefault();
-  // clean points → int or null
-  const cleanedPoints = {};
-  Object.keys(points).forEach(name => {
-    cleanedPoints[name] = points[name].map(v => {
-      const i = parseInt(v);
-      return Number.isInteger(i) ? i : null;
+// Unified submit handler — builds payload including f7_mades and first_timers
+document.getElementById('log-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // clean points → int or null
+    const cleanedPoints = {};
+    Object.keys(points).forEach(name => {
+        cleanedPoints[name] = points[name].map(v => {
+            const i = parseInt(v);
+            return Number.isInteger(i) ? i : null;
+        });
     });
-  });
-  const duration = (() => {
-    const i = parseInt(durationInput.value);
-    return Number.isInteger(i) ? i : null;
-  })();
-  let limit_points = (() => {
-    const i = parseInt(ptsLimitInput.value);
-    return Number.isInteger(i) ? i : null;
-  })();
-  if (!gamesWithPointLimits.includes(gameInput.value)) limit_points = null;
 
-  const payload = {
-    date:         dateInput.value,
-    game:         gameInput.value,
-    players:      [...players],
-    winners:      [...winnersList],
-    points:       cleanedPoints,
-    rounds:       rowCount,
-    duration,
-    limit_points
-  };
+    const duration = (() => {
+        const i = parseInt(durationInput.value);
+        return Number.isInteger(i) ? i : null;
+    })();
 
-  fetch('/api/log', {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
-  })
-    .then(r => {
-      if (!r.ok) throw new Error(r.statusText);
-      return r.json();
-    })
-    .then(json => {
-      showToast('Partida guardada!');
-      console.log('Saved:', json);
+    let limit_points = (() => {
+        const i = parseInt(ptsLimitInput.value);
+        return Number.isInteger(i) ? i : null;
+    })();
+    if (!gamesWithPointLimits.includes(gameInput.value)) limit_points = null;
 
-      // ----- CLEANUP & RESET -----
-      // Close the form
-      btnLog.click();
+    const payload = {
+        date:         dateInput.value,
+        game:         gameInput.value,
+        players:      [...players],
+        winners:      [...winnersList],
+        points:       cleanedPoints,
+        rounds:       rowCount,
+        duration,
+        limit_points
+    };
 
-      // Reset state
-      players = [];
-      winnersList = [];
-      points = {};
-      rowCount = 1;
+    // Add Flip 7 specifics
+    if (gameInput.value.trim().toLowerCase() === "flip 7" && f7Mades.length > 0) {
+        payload.f7_mades = [...f7Mades];
+    }
 
-      // Reset inputs
-      gameInput.value      = '';
-      durationInput.value  = '';
-      ptsLimitInput.value  = '';
-      dateInput.valueAsDate = new Date();
-      playerInput.value    = '';
-      noWinnerCheckbox.checked = false;
-      togglePtsLimit();   // hides pts-limit if needed
+    // Add first_timers (null if none)
+    payload.first_timers = firstTimers.length ? [...firstTimers] : null;
 
-      // Re-render empty UI
-      renderPlayers();
-    })
-    .catch(err => {
-      console.error(err);
-      alert('Error guardando, ver consola');
-    });
+    try {
+        const r = await fetch('/api/log', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+        });
+        if (!r.ok) throw new Error(r.statusText);
+        const json = await r.json();
+
+        showToast('Partida guardada!');
+        console.log('Saved:', json);
+
+        // ----- CLEANUP & RESET -----
+        btnLog.click(); // close form
+
+        players = [];
+        winnersList = [];
+        points = {};
+        rowCount = 1;
+        firstTimers = [];
+        f7Mades = [];
+
+        // Reset inputs
+        gameInput.value      = '';
+        durationInput.value  = '';
+        ptsLimitInput.value  = '';
+        dateInput.valueAsDate = new Date();
+        playerInput.value    = '';
+        noWinnerCheckbox.checked = false;
+        togglePtsLimit();   // hides pts-limit if needed
+
+        // Re-render empty UI
+        renderPlayers();
+        renderF7Mades();
+        renderFirstTimers();
+    } catch (err) {
+        console.error(err);
+        alert('Error guardando, ver consola');
+    }
 });
 
 
 import { renderMostPlayedStat, renderWinsBarplot } from './stats.js';
 
 async function fetchLogs() {
-  try {
-    const res = await fetch('/api/logs_extraction');
-    if (!res.ok) throw new Error(res.statusText);
-    extracted_logs = await res.json();
-    console.log('Extracted logs:', extracted_logs);
-  } catch (err) {
-    // Use sample data if fetch fails (e.g., when running locally)
-    console.warn('Falling back to local sample data:', err);
-    extracted_logs = SAMPLE_LOGS;
-    console.log('Sample logs:', extracted_logs);
-  }
+    try {
+        const res = await fetch('/api/logs_extraction');
+        if (!res.ok) throw new Error(res.statusText);
+        extracted_logs = await res.json();
+        console.log('Extracted logs:', extracted_logs);
+    } catch (err) {
+        // Use sample data if fetch fails (e.g., when running locally)
+        console.warn('Falling back to local sample data:', err);
+        extracted_logs = SAMPLE_LOGS;
+        console.log('Sample logs:', extracted_logs);
+    }
 
-  // Render stats
-  const statsGrid = document.getElementById('stats-grid');
-  statsGrid.innerHTML = ""; // Clear previous
+    // Render stats
+    const statsGrid = document.getElementById('stats-grid');
+    statsGrid.innerHTML = ""; // Clear previous
 
-  // Create separate containers for each stat box
-  const mostPlayedDiv = document.createElement('div');
-  const barplotDiv = document.createElement('div');
-  statsGrid.appendChild(mostPlayedDiv);
-  statsGrid.appendChild(barplotDiv);
+    // Create separate containers for each stat box
+    const mostPlayedDiv = document.createElement('div');
+    const barplotDiv = document.createElement('div');
+    statsGrid.appendChild(mostPlayedDiv);
+    statsGrid.appendChild(barplotDiv);
 
-  renderMostPlayedStat(extracted_logs, mostPlayedDiv);
-  renderWinsBarplot(extracted_logs, barplotDiv);
+    renderMostPlayedStat(extracted_logs, mostPlayedDiv);
+    renderWinsBarplot(extracted_logs, barplotDiv);
 }
 
 
@@ -505,7 +595,6 @@ const SAMPLE_LOGS = [
 ];
 
 
-
 // Initial render
 renderPlayers();
 
@@ -522,15 +611,14 @@ let f7Mades = [];
 
 // Helper: get player color (reuse your player color logic)
 function getPlayerColor(name) {
-  // Use the same color assignment as your players input
   if (window.playersColors && window.playersColors[name]) {
     return window.playersColors[name];
   }
-  // fallback color
   return "#fff";
 }
 
 function renderF7Mades() {
+  if (!f7List) return;
   f7List.innerHTML = "";
   f7Mades.forEach((entry, idx) => {
     const [player, round] = entry.split("-");
@@ -540,7 +628,7 @@ function renderF7Mades() {
     pill.style.borderColor = color;
     pill.style.color = color;
     pill.style.background = "transparent";
-    pill.style.fontSize = "1rem"; // Match player box font size
+    pill.style.fontSize = "1rem";
     pill.style.fontFamily = "inherit";
     pill.style.padding = "4px 12px";
     pill.style.marginBottom = "4px";
@@ -585,7 +673,6 @@ f7AddBtn.addEventListener("click", addF7Hecho);
 // Show/hide F7 hechos based on game selection
 ["input", "change"].forEach(evt =>
   gameInput.addEventListener(evt, () => {
-    // Case-insensitive, trimmed check
     if (gameInput.value.trim().toLowerCase() === "flip 7") {
       f7Container.classList.remove("hidden");
     } else {
@@ -597,12 +684,6 @@ f7AddBtn.addEventListener("click", addF7Hecho);
 );
 
 // --- On form submit, add f7_mades if needed ---
-document.getElementById('log-form').addEventListener('submit', e => {
-  // ...existing code to build payload...
-  if (gameInput.value.trim() === "Flip 7" && f7Mades.length > 0) {
-    payload.f7_mades = [...f7Mades];
-  }
-  // ...rest of submit logic...
-});
+// (handled by unified submit handler above)
 
-window.playersColors = {}; // { "Lucas": "#7ad069", ... }
+window.playersColors = window.playersColors || {};
