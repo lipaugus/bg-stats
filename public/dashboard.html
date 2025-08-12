@@ -46,6 +46,46 @@
           placeholder="Duración"
         />
 
+        <!-- Rounds / Vueltas input (will switch placeholder to 'Vueltas' when game is Heat) -->
+        <input
+          type="number"
+          id="rounds-input"
+          class="input-log-box"
+          placeholder="Rondas"
+          min="1"
+        />
+
+        <!-- Heat extras: Circuito (input) + mode radios (stacked) -->
+        <!-- Heat extras: Circuito (input + styled dropdown) + stacked mode radios -->
+<div id="heat-extras" class="hidden">
+  <div style="position: relative; width: 100%;">
+    <input
+      type="text"
+      id="heat-track-select"
+      class="input-log-box"
+      placeholder="Circuito"
+      autocomplete="off"
+    />
+    <ul id="heat-track-list"></ul>
+  </div>
+
+  <!-- stacked, custom-styled radios (under the circuito input) -->
+  <div class="heat-mode" role="radiogroup" aria-label="Modo Heat">
+    <label class="radio-option">
+      <input type="radio" name="heat-mode" value="Base" checked />
+      <span class="radio-custom" aria-hidden="true"></span>
+      <span class="radio-label-text">Base</span>
+    </label>
+
+    <label class="radio-option">
+      <input type="radio" name="heat-mode" value="Advanzado" />
+      <span class="radio-custom" aria-hidden="true"></span>
+      <span class="radio-label-text">Advanzado</span>
+    </label>
+  </div>
+</div>
+
+
         <!-- Points Limit -->
         <input
           type="number"

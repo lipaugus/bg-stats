@@ -92,20 +92,33 @@ input[type="number"] {
   box-sizing: border-box;
 }
 
-/* Mobile */
+/* --- Smaller baseline fonts inside the form --- */
+#log-form,
+#log-form * {
+  font-size: 0.92rem; /* smaller overall text per request */
+  box-sizing: border-box;
+}
+
+/* Mobile: keep a comfortable gap from phone edges and small improvements */
 @media screen and (max-width: 640px) {
+  /* make the inner form slightly narrower than the viewport so there's a gap on both sides */
   #log-form {
-    width: 100vw !important;
-    max-width: 100vw !important;
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
     min-width: 0 !important;
-    padding: 16px 8px !important;
+    padding: 16px !important;
     gap: 12px !important;
     font-size: 0.9rem !important;
     box-sizing: border-box;
+    margin: 0 12px;            /* small side gutters */
+    border-radius: 12px;       /* keep nice rounded corners on mobile */
   }
+
+  /* add a little breathing room around the whole overlay */
   #log-form-container {
-    padding: 0 !important;
+    padding: 8px !important;
   }
+
   /* Ensure close button is above the form */
   #btn-loggear {
     z-index: 3001 !important;
@@ -114,7 +127,7 @@ input[type="number"] {
 
 #log-form h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   text-align: center;
 }
 
@@ -140,6 +153,7 @@ input[type="number"] {
   border: 0;
   border-bottom: 1px solid white;
   border-radius: 0 !important;
+  font-size: inherit;
 }
 
 /* Remove dropdown arrow from game select box */
@@ -167,7 +181,9 @@ input[type="number"] {
   background: #161616;
   display: none;
   z-index: 1000;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Change calendar logo on date picker to white */
@@ -269,14 +285,14 @@ input[type="number"] {
   align-items: center;
   cursor: pointer;
   user-select: none;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
 }
 .player-box .name {
   margin-right: 8px;
 }
 .player-box .remove {
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 
 /* Scores table base */
@@ -318,25 +334,9 @@ input[type="number"] {
   border-radius: 0 !important;
 }
 
-/* Table controls styling */
+/* Table controls styling (hidden, we don't use them now) */
 .table-controls {
-  display: flex;
-  justify-content: center; /* center the buttons in the column */
-  gap: 8px;
-  margin-top: 10px;
-}
-.table-controls button {
-  background: transparent;
-  border: 2px solid #333333;
-  color: #333333;
-  padding: 4px 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 6px;
-}
-.table-controls button:hover {
-  background: #333333;
-  color: #1e1e1e;
+  display: none;
 }
 
 /* Submit button */
@@ -382,15 +382,15 @@ input[type="number"] {
 }
 
 .f7-mades-container {
-  margin-top: 18px;
+  margin-top: 12px;
   margin-bottom: 10px;
 }
 .f7-mades-label {
   display: block;
-  font-weight: normal;   /* Not bold */
-  font-size: 1rem;       /* Match input size */
+  font-weight: normal; /* Not bold */
+  font-size: 0.95rem; /* Match input size */
   margin-bottom: 6px;
-  color: #ccc;           /* Match input label color */
+  color: #ccc; /* Match input label color */
 }
 .f7-mades-input-row {
   display: flex;
@@ -402,7 +402,7 @@ input[type="number"] {
   color: #7ad069;
   border: none;
   border-radius: 6px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   padding: 0 12px;
   cursor: pointer;
   height: 36px;
@@ -417,93 +417,147 @@ input[type="number"] {
   gap: 8px;
   margin-top: 10px;
 }
+
+/* default background for f7/first-timers pills is #1e1e1e now and styling matches player-box */
 .f7-pill {
   display: flex;
   align-items: center;
-  border: 2px solid #fff;
-  border-radius: 18px;
+  border: 2px solid;
+  border-radius: 16px;
   padding: 4px 12px;
-  font-size: 1rem;
-  background: transparent;
-  color: #fff;
+  font-size: 0.95rem;
+  background: #1e1e1e;
+  color: inherit;
   margin-bottom: 4px;
   gap: 8px;
   font-family: inherit;
+  cursor: pointer;
 }
 .f7-pill .f7-pill-delete {
   background: none;
   border: none;
   color: inherit;
-  font-size: 1.1em;
-  margin-left: 4px;
+  font-size: 0.95rem;
+  margin-left: 6px;
   cursor: pointer;
   border-radius: 50%;
   padding: 0 4px;
   line-height: 1;
 }
 
-@media screen and (max-width: 640px) {
-  /* 1) Pin the toggle button smaller in the corner */
-  button#btn-loggear {
-    position: fixed !important;
-    bottom: 12px !important;
-    right: 12px !important;
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 20px !important;
-    padding: 0 !important;
-  }
+/* Heat inputs: use same dropdown/list style as game select */
+#heat-extras {
+  margin-top: 8px;
+}
+#heat-track-select {
+  width: 100%;
+  display: block;
+  padding: 7px;
+  background-color: #1b1b1b;
+  color: white;
+  border: 0;
+  border-bottom: 1px solid white;
+  border-radius: 0 !important;
+  margin-top: 6px;
+  font-size: inherit;
+}
+#heat-track-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 150px;
+  overflow-y: auto;
+  color: white;
+  background: #161616;
+  display: none; /* toggled by JS */
+  z-index: 1000;
+  font-size: 0.85rem; /* slightly smaller suggestion font */
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+#heat-track-list li {
+  padding: 0.25em 0.5em;
+  cursor: pointer;
+}
+#heat-track-list li:hover {
+  background: rgba(255,255,255,0.03);
+}
 
-  /* 2) When visible, force the form container full-screen */
-  #log-form-container.visible {
-    display: flex !important; /* override the .hidden display:none */
-    flex-direction: column; /* center its contents */
-    align-items: center;
-    justify-content: center;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 16px !important;
-    background: rgba(0, 0, 0, 0.85) !important;
-    opacity: 1 !important; /* override any opacity animation */
-    transform: translateY(0) !important; /* override any translate */
-    pointer-events: auto !important;
-    z-index: 2000 !important;
-  }
+/* Make radio buttons stacked and look consistent across devices (balanced spacing) */
+.heat-mode {
+  margin-top: 20px; /* Slightly more space per request */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 0.92rem;
+  user-select: none;
+}
 
-  /* 3) Shrink & center the inner form */
-  #log-form {
-    width: 100% !important;
-    max-width: 360px !important;
-    padding: 16px !important;
-    gap: 12px !important;
-    font-size: 0.9rem !important;
-  }
+/* Hide native radio, show custom circle */
+.radio-option input[type="radio"] {
+  display: none;
+}
+.radio-custom {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+  background: transparent;
+  position: relative;
+}
+.radio-custom::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #161616;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.radio-option input[type="radio"]:checked + .radio-custom {
+  border-color: #7ad069;
+  background: #7ad069;
+}
+.radio-option input[type="radio"]:checked + .radio-custom::after {
+  opacity: 1;
+}
 
-  /* 4) Smaller inputs, table, buttons */
-  .input-log-box,
-  #scores-container input,
-  .table-controls button,
-  #btn-submit {
-    font-size: 0.8rem !important;
-  }
+/* Ensure the heat-extras block does not occupy space when hidden */
+#heat-extras.hidden {
+  display: none;
+}
 
-  .score-table th {
-    font-size: 0.8rem !important;
-    padding: 6px !important;
-  }
+/* Make first-timers container not occupy space when hidden */
+#first-timers-container.hidden {
+  display: none;
 }
 
 @media screen and (max-width: 640px) {
-  .no-winner-checkbox .cbx {
-    width: 100%;
-    display: inline-block;
-  }
+  /* smaller text on mobile */
+  #log-form, #log-form * { font-size: 0.9rem; }
+  .f7-pill, .player-box { font-size: 0.9rem; }
+  #heat-track-list { font-size: 0.82rem; }
 }
+
+/* animation keyframes */
 @-moz-keyframes wave-4 {
   50% {
     transform: scale(0.9);
