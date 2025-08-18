@@ -518,7 +518,8 @@ function handleGameChange() {
   // Heat special inputs (do NOT auto-open the circuito dropdown)
   if (val.toLowerCase() === "heat") {
     if (heatContainer) heatContainer.classList.remove("hidden");
-    roundsInput.placeholder = "Vueltas";
+    // REVERTED: keep placeholder "Rondas" rather than "Vueltas"
+    roundsInput.placeholder = "Rondas";
     // do NOT call renderTrackList here - leave dropdown closed until user focuses/inputs
   } else {
     if (heatContainer) {

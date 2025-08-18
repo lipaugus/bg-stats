@@ -3,6 +3,11 @@ header {
   display: flex;
 }
 
+/* Prevent text-size-adjust quirks on mobile */
+html, body {
+  -webkit-text-size-adjust: 100%;
+}
+
 /* Remove up/down arrows in Chrome, Safari, Edge */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -71,7 +76,8 @@ input[type="number"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: auto; /* Allow scrolling */
+  overflow: auto; /* Allow scrolling if the overlay overflows */
+  -webkit-overflow-scrolling: touch;
 }
 
 #log-form-container.hidden {
@@ -90,6 +96,11 @@ input[type="number"] {
   flex-direction: column;
   gap: 18px;
   box-sizing: border-box;
+
+  /* allow internal scrolling on small screens */
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* --- Smaller baseline fonts inside the form --- */
@@ -112,6 +123,7 @@ input[type="number"] {
     box-sizing: border-box;
     margin: 0 12px;            /* small side gutters */
     border-radius: 12px;       /* keep nice rounded corners on mobile */
+    max-height: calc(100vh - 48px); /* ensure internal scroll works */
   }
 
   /* add a little breathing room around the whole overlay */
@@ -122,6 +134,19 @@ input[type="number"] {
   /* Ensure close button is above the form */
   #btn-loggear {
     z-index: 3001 !important;
+  }
+
+  /* Prevent iOS zoom when focusing scoring inputs by making them >= 16px */
+  .score-table td input {
+    font-size: 16px !important;
+    line-height: 1.2;
+  }
+
+  /* also ensure other small inputs don't trigger zoom if needed */
+  #players-enter,
+  #f7-player-input,
+  #heat-track-select {
+    font-size: 15px;
   }
 }
 
@@ -489,7 +514,7 @@ input[type="number"] {
 
 /* Make radio buttons stacked and look consistent across devices (balanced spacing) */
 .heat-mode {
-  margin-top: 20px; /* Slightly more space per request */
+  margin-top: 10px; /* Slightly more space per request */
   display: flex;
   flex-direction: column;
   gap: 6px;
