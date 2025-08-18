@@ -1,3 +1,6 @@
+/* dashboard.css - updated: mobile scrolling + prevent input zoom fixes */
+
+/* --- Base / header --- */
 header {
   padding: 16px;
   display: flex;
@@ -6,21 +9,24 @@ header {
 /* Prevent text-size-adjust quirks on mobile */
 html, body {
   -webkit-text-size-adjust: 100%;
+  height: 100%;
+  margin: 0;
 }
 
-/* Remove up/down arrows in Chrome, Safari, Edge */
+/* Remove number input arrows in Chrome/Safari/Edge */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Remove up/down arrows in Firefox */
+/* Remove number arrows in Firefox */
 input[type="number"] {
   appearance: textfield;
   -moz-appearance: textfield;
 }
 
+/* Floating log button */
 #btn-loggear {
   position: fixed;
   bottom: 20px;
@@ -40,50 +46,39 @@ input[type="number"] {
     color 0.2s ease;
   line-height: 0;
 }
-#btn-loggear:hover {
-  background: #7ad069;
-  color: #161616;
-}
+#btn-loggear:hover { background: #7ad069; color: #161616; }
 #btn-loggear.active {
   font-size: 16px;
   background: #161616;
   border-color: #e74c3c;
   color: #e74c3c;
   transform: rotate(90deg);
-  transition: transform 0.3s ease, background 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease;
 }
-#btn-loggear.active:hover {
-  background: #e74c3c;
-  border-color: #e74c3c;
-  color: #161616;
-}
+#btn-loggear.active:hover { background: #e74c3c; color: #161616; }
 
-/* Hide any "hidden" class element*/
-.hidden {
-  display: none;
-}
+/* Utility */
+.hidden { display: none; }
 
-/* Log form big container */
+/* --- Overlay / form container --- */
 #log-form-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(20, 20, 20, 0.96);
+  background: rgba(20,20,20,0.96);
   z-index: 1000;
   display: flex;
-  align-items: center;
+  align-items: center;         /* centered on desktop */
   justify-content: center;
-  overflow: auto; /* Allow scrolling if the overlay overflows */
-  -webkit-overflow-scrolling: touch;
+  overflow: auto;              /* allow overlay to scroll if needed */
+  -webkit-overflow-scrolling: touch; /* native momentum scrolling */
 }
 
-#log-form-container.hidden {
-  display: none;
-}
+/* hide */
+#log-form-container.hidden { display: none; }
 
+/* Inner form card */
 #log-form {
   background-color: #1e1e1e;
   padding: 32px;
@@ -97,59 +92,19 @@ input[type="number"] {
   gap: 18px;
   box-sizing: border-box;
 
-  /* allow internal scrolling on small screens */
+  /* allow internal scroll when content too tall */
   max-height: calc(100vh - 48px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* --- Smaller baseline fonts inside the form --- */
-#log-form,
-#log-form * {
-  font-size: 0.92rem; /* smaller overall text per request */
+/* Baseline font sizing inside form */
+#log-form, #log-form * {
+  font-size: 0.92rem;
   box-sizing: border-box;
 }
 
-/* Mobile: keep a comfortable gap from phone edges and small improvements */
-@media screen and (max-width: 640px) {
-  /* make the inner form slightly narrower than the viewport so there's a gap on both sides */
-  #log-form {
-    width: calc(100% - 24px) !important;
-    max-width: calc(100% - 24px) !important;
-    min-width: 0 !important;
-    padding: 16px !important;
-    gap: 12px !important;
-    font-size: 0.9rem !important;
-    box-sizing: border-box;
-    margin: 0 12px;            /* small side gutters */
-    border-radius: 12px;       /* keep nice rounded corners on mobile */
-    max-height: calc(100vh - 48px); /* ensure internal scroll works */
-  }
-
-  /* add a little breathing room around the whole overlay */
-  #log-form-container {
-    padding: 8px !important;
-  }
-
-  /* Ensure close button is above the form */
-  #btn-loggear {
-    z-index: 3001 !important;
-  }
-
-  /* Prevent iOS zoom when focusing scoring inputs by making them >= 16px */
-  .score-table td input {
-    font-size: 16px !important;
-    line-height: 1.2;
-  }
-
-  /* also ensure other small inputs don't trigger zoom if needed */
-  #players-enter,
-  #f7-player-input,
-  #heat-track-select {
-    font-size: 15px;
-  }
-}
-
+/* Form header */
 #log-form h2 {
   margin: 0;
   font-size: 18px;
@@ -158,7 +113,6 @@ input[type="number"] {
 
 /* Container animation */
 .log-form-container {
-  /* start hidden but keep it in-layout for animation */
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -170,7 +124,7 @@ input[type="number"] {
   pointer-events: auto;
 }
 
-/* Log input boxes */
+/* Input style shared */
 .input-log-box {
   background-color: #1b1b1b;
   color: white;
@@ -179,9 +133,11 @@ input[type="number"] {
   border-bottom: 1px solid white;
   border-radius: 0 !important;
   font-size: inherit;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Remove dropdown arrow from game select box */
+/* Game dropdown list */
 #game-select {
   appearance: none;
   -webkit-appearance: none;
@@ -198,8 +154,6 @@ input[type="number"] {
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 0px;
-  border-top: none;
   max-height: 150px;
   overflow-y: auto;
   color: white;
@@ -208,161 +162,70 @@ input[type="number"] {
   z-index: 1000;
   font-size: 0.85rem;
   border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
-/* Change calendar logo on date picker to white */
-#date-played::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-}
+/* Date picker icon color */
+#date-played::-webkit-calendar-picker-indicator { filter: invert(1); }
 
-/* No winners checkbox */
-.no-winner-checkbox * {
-  box-sizing: border-box;
-}
+/* No-winner checkbox styling */
+.no-winner-checkbox * { box-sizing: border-box; }
 .no-winner-checkbox .cbx {
   -webkit-user-select: none;
   user-select: none;
   cursor: pointer;
   padding: 6px 8px;
   border-radius: 6px;
-  overflow: hidden;
-  transition: all 0.2s ease;
   display: inline-block;
   font-size: 0.8rem;
 }
-.no-winner-checkbox .cbx:not(:last-child) {
-  margin-right: 6px;
-}
-.no-winner-checkbox .cbx:hover {
-  background: rgba(99, 99, 99, 0.06);
-}
-.no-winner-checkbox .cbx span {
-  float: left;
-  vertical-align: middle;
-  transform: translate3d(0, 0, 0);
-}
-.no-winner-checkbox .cbx span:first-child {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  transform: scale(1);
-  border: 1px solid #cccfdb;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 1px rgba(0, 16, 75, 0.05);
-}
-.no-winner-checkbox .cbx span:first-child svg {
-  position: absolute;
-  top: 3px;
-  left: 2px;
-  fill: none;
-  stroke: #fff;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 16px;
-  stroke-dashoffset: 16px;
-  transition: all 0.3s ease;
-  transition-delay: 0.1s;
-  transform: translate3d(0, 0, 0);
-}
-.no-winner-checkbox .cbx span:last-child {
-  padding-left: 8px;
-  line-height: 18px;
-}
-.no-winner-checkbox .cbx:hover span:first-child {
-  border-color: #07f;
-}
-.no-winner-checkbox .inp-cbx {
-  position: absolute;
-  visibility: hidden;
-}
-.no-winner-checkbox .inp-cbx:checked + .cbx span:first-child {
-  background: #07f;
-  border-color: #07f;
-  animation: wave-4 0.4s ease;
-}
-.no-winner-checkbox .inp-cbx:checked + .cbx span:first-child svg {
-  stroke-dashoffset: 0;
-}
-.no-winner-checkbox .inline-svg {
-  position: absolute;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-  user-select: none;
-}
+.no-winner-checkbox .cbx:hover { background: rgba(99,99,99,0.06); }
+.no-winner-checkbox .inp-cbx { position:absolute; visibility:hidden; }
 
-/* Container for players' list */
+/* Players container */
 #players-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
 }
 .player-box {
   background: #1e1e1e;
   border: 2px solid;
   border-radius: 16px;
   padding: 4px 12px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-  font-size: 0.95rem;
+  display:flex;
+  align-items:center;
+  cursor:pointer;
+  user-select:none;
+  font-size:0.95rem;
 }
-.player-box .name {
-  margin-right: 8px;
-}
-.player-box .remove {
-  cursor: pointer;
-  font-size: 0.9rem;
-}
+.player-box .name { margin-right:8px; }
+.player-box .remove { cursor:pointer; font-size:0.9rem; }
 
-/* Scores table base */
+/* Scores table */
 .score-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  background: #1e1e1e;
-  color: white;
+  width:100%;
+  border-collapse:collapse;
+  margin-top:16px;
+  background:#1e1e1e;
+  color:white;
 }
-
-/* Header cells: background injected inline */
-.score-table th {
-  padding: 8px;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  border-radius: 0 !important;
-}
-
-/* Data cells: inputs stretch full width */
-#scores-container {
-  align-items: center; /* vertical centering */
-  gap: 16px;
-}
-
-.score-table td {
-  padding: 4px;
-  border-radius: 0 !important;
-}
+.score-table th { padding:8px; text-transform:uppercase; font-size:0.9rem; }
+.score-table td { padding:4px; }
 .score-table td input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent; /* will color-bottom inline */
-  color: white;
-  text-align: center;
-  padding: 4px 0;
-  font-size: 0.9rem;
-  border-radius: 0 !important;
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:2px solid transparent;
+  color:white;
+  text-align:center;
+  padding:4px 0;
+  font-size:0.9rem;
 }
 
-/* Table controls styling (hidden, we don't use them now) */
-.table-controls {
-  display: none;
-}
+/* Controls (unused) */
+.table-controls { display:none; }
 
 /* Submit button */
 #btn-submit {
@@ -374,232 +237,131 @@ input[type="number"] {
   cursor: pointer;
   border-radius: 10px;
 }
-#btn-submit:hover {
-  background: #7ad069;
-  color: #161616;
-}
+#btn-submit:hover { background: #7ad069; color: #161616; }
 
-/* Toast popup for successful save in mongodb */
-/* Toast notification */
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #4caf50;
-  color: white;
-  padding: 12px 16px;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 4000;
-  font-size: 0.9rem;
-}
+/* Toast */
+.toast { position:fixed; top:20px; right:20px; background:#4caf50; color:#fff; padding:12px 16px; border-radius:4px; z-index:4000; }
 
-.toast .close-toast {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  line-height: 1;
-  cursor: pointer;
+/* F7 & first-timers pills: match player-box visuals */
+.f7-mades-container { margin-top:12px; margin-bottom:10px; }
+.f7-mades-label, .first-timers-label {
+  display:block;
+  font-weight:normal;
+  font-size:0.95rem;
+  margin-bottom:6px;
+  color:#ccc;
 }
-
-.f7-mades-container {
-  margin-top: 12px;
-  margin-bottom: 10px;
-}
-.f7-mades-label {
-  display: block;
-  font-weight: normal; /* Not bold */
-  font-size: 0.95rem; /* Match input size */
-  margin-bottom: 6px;
-  color: #ccc; /* Match input label color */
-}
-.f7-mades-input-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.f7-add-btn {
-  background: #222;
-  color: #7ad069;
-  border: none;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  padding: 0 12px;
-  cursor: pointer;
-  height: 36px;
-  transition: background 0.2s;
-}
-.f7-add-btn:hover {
-  background: #333;
-}
-.f7-mades-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-/* default background for f7/first-timers pills is #1e1e1e now and styling matches player-box */
+.f7-mades-list, #first-timers-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
 .f7-pill {
-  display: flex;
-  align-items: center;
-  border: 2px solid;
-  border-radius: 16px;
-  padding: 4px 12px;
-  font-size: 0.95rem;
-  background: #1e1e1e;
-  color: inherit;
-  margin-bottom: 4px;
-  gap: 8px;
-  font-family: inherit;
-  cursor: pointer;
+  display:flex; align-items:center; gap:8px;
+  border:2px solid;
+  border-radius:16px;
+  padding:4px 12px;
+  background:#1e1e1e;
+  font-size:0.95rem;
+  cursor:pointer;
 }
-.f7-pill .f7-pill-delete {
-  background: none;
-  border: none;
-  color: inherit;
-  font-size: 0.95rem;
-  margin-left: 6px;
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 0 4px;
-  line-height: 1;
-}
+.f7-pill .f7-pill-delete { background:none; border:none; color:inherit; font-size:0.95rem; margin-left:6px; cursor:pointer; }
 
-/* Heat inputs: use same dropdown/list style as game select */
-#heat-extras {
-  margin-top: 8px;
-}
+/* Heat extras - circuito & track list */
+#heat-extras { margin-top:8px; position: relative; }
 #heat-track-select {
-  width: 100%;
-  display: block;
-  padding: 7px;
-  background-color: #1b1b1b;
-  color: white;
-  border: 0;
-  border-bottom: 1px solid white;
-  border-radius: 0 !important;
-  margin-top: 6px;
+  width:100%;
+  padding:7px;
+  background-color:#1b1b1b;
+  color:white;
+  border:0;
+  border-bottom:1px solid white;
+  margin-top:6px;
   font-size: inherit;
+  box-sizing: border-box;
 }
 #heat-track-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  max-height: 150px;
-  overflow-y: auto;
-  color: white;
-  background: #161616;
-  display: none; /* toggled by JS */
-  z-index: 1000;
-  font-size: 0.85rem; /* slightly smaller suggestion font */
-  border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  margin:0;
+  padding:0;
+  list-style:none;
+  max-height:150px;
+  overflow-y:auto;
+  color:white;
+  background:#161616;
+  display:none;
+  z-index:1000;
+  font-size:0.85rem;
+  border-radius:4px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.5);
 }
-#heat-track-list li {
-  padding: 0.25em 0.5em;
-  cursor: pointer;
-}
-#heat-track-list li:hover {
-  background: rgba(255,255,255,0.03);
-}
+#heat-track-list li { padding:0.25em 0.5em; cursor:pointer; }
+#heat-track-list li:hover { background: rgba(255,255,255,0.03); }
 
-/* Make radio buttons stacked and look consistent across devices (balanced spacing) */
-.heat-mode {
-  margin-top: 10px; /* Slightly more space per request */
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: #ccc;
-  font-size: 0.92rem;
-  user-select: none;
-}
-
-/* Hide native radio, show custom circle */
-.radio-option input[type="radio"] {
-  display: none;
-}
+/* Radio buttons for Heat */
+.heat-mode { margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+.radio-option { display:flex; align-items:center; gap:8px; cursor:pointer; color:#ccc; font-size:0.92rem; user-select:none; }
+.radio-option input[type="radio"] { display:none; }
 .radio-custom {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-  display: inline-block;
-  margin-right: 6px;
-  vertical-align: middle;
-  background: transparent;
-  position: relative;
+  width:16px; height:16px; border-radius:50%; border:2px solid #ccc; position:relative; display:inline-block; margin-right:6px;
 }
-.radio-custom::after {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #161616;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(0.6);
-  opacity: 0;
-  transition: opacity 0.12s ease;
-}
-.radio-option input[type="radio"]:checked + .radio-custom {
-  border-color: #7ad069;
-  background: #7ad069;
-}
-.radio-option input[type="radio"]:checked + .radio-custom::after {
-  opacity: 1;
-}
+.radio-custom::after { content:""; width:7px; height:7px; border-radius:50%; background:#161616; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0.6); opacity:0; transition:opacity 0.12s; }
+.radio-option input[type="radio"]:checked + .radio-custom { border-color:#7ad069; background:#7ad069; }
+.radio-option input[type="radio"]:checked + .radio-custom::after { opacity:1; }
 
-/* Ensure the heat-extras block does not occupy space when hidden */
-#heat-extras.hidden {
-  display: none;
-}
+/* Hide heat extras & first-timers when hidden */
+#heat-extras.hidden, #first-timers-container.hidden { display:none; }
 
-/* Make first-timers container not occupy space when hidden */
-#first-timers-container.hidden {
-  display: none;
-}
-
+/* Small adjustments for small screens (prevent zoom & ensure scroll) */
 @media screen and (max-width: 640px) {
-  /* smaller text on mobile */
-  #log-form, #log-form * { font-size: 0.9rem; }
-  .f7-pill, .player-box { font-size: 0.9rem; }
-  #heat-track-list { font-size: 0.82rem; }
+  /* keep a gap from edges and ensure form is scrollable rather than fixed-centered */
+  #log-form {
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+    padding: 16px !important;
+    gap: 12px !important;
+    margin: 0 12px;
+    border-radius: 12px;
+    max-height: calc(100vh - 48px);
+  }
+
+  /* Make overlay align to start so keyboard won't trap the centered form */
+  #log-form-container.visible {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 18px;
+  }
+
+  /* Enable smooth native scrolling on the container & form */
+  #log-form-container, #log-form {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+
+  /* Prevent iOS zoom-on-focus by making interactive controls >= 16px */
+  input, select, textarea, .input-log-box,
+  #heat-track-select, #players-enter, #f7-player-input, #f7-round-input, #rounds-input,
+  .score-table td input {
+    font-size: 16px !important;
+    line-height: 1.2;
+  }
+
+  /* Keep pill & player fonts slightly smaller but >= 14 */
+  .f7-pill, .player-box { font-size: 14px !important; }
+
+  /* Slightly reduce dropdown font size to match */
+  #game-select-list, #heat-track-list { font-size: 0.85rem; }
+
+  /* Reduce some gaps for better fit */
+  .f7-mades-label, .first-timers-label { font-size: 0.92rem; margin-bottom:6px; }
 }
 
-/* animation keyframes */
-@-moz-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
+/* Additional small-screen polish */
+@media screen and (max-width: 360px) {
+  #log-form { padding: 12px !important; }
+  #btn-loggear { bottom: 12px; right: 12px; width:36px; height:36px; font-size:20px; }
 }
-@-webkit-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-@-o-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-@keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
+
+/* animations */
+@-moz-keyframes wave-4 { 50% { transform: scale(0.9); } }
+@-webkit-keyframes wave-4 { 50% { transform: scale(0.9); } }
+@keyframes wave-4 { 50% { transform: scale(0.9); } }
