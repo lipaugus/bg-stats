@@ -6,10 +6,10 @@
 
     <!-- shared styles -->
     <link rel="stylesheet" href="css/main.css" />
-
-    <!-- dashboard‑specific styles -->
+    
+    <!-- dashboard-specific styles -->
     <link rel="stylesheet" href="css/dashboard.css" />
-
+    
     <!-- stat box styles -->
     <link rel="stylesheet" href="css/stats.css" />
 
@@ -39,61 +39,13 @@
         <input type="date" id="date-played" class="input-log-box" />
 
         <!-- Duration input -->
-        <input
-          type="number"
-          id="duration-input"
-          class="input-log-box"
-          placeholder="Duración"
-        />
+        <input type="number" id="duration-input" class="input-log-box" placeholder="Duración"/>
 
-        <!-- Rounds / Vueltas input (will switch placeholder to 'Vueltas' when game is Heat) -->
-        <input
-          type="number"
-          id="rounds-input"
-          class="input-log-box"
-          placeholder="Rondas"
-          min="1"
-        />
-
-        <!-- Heat extras: Circuito (input) + mode radios (stacked) -->
-        <!-- Heat extras: Circuito (input + styled dropdown) + stacked mode radios -->
-<div id="heat-extras" class="hidden">
-  <div style="position: relative; width: 100%;">
-    <input
-      type="text"
-      id="heat-track-select"
-      class="input-log-box"
-      placeholder="Circuito"
-      autocomplete="off"
-    />
-    <ul id="heat-track-list"></ul>
-  </div>
-
-  <!-- stacked, custom-styled radios (under the circuito input) -->
-  <div class="heat-mode" role="radiogroup" aria-label="Modo Heat">
-    <label class="radio-option">
-      <input type="radio" name="heat-mode" value="Base" checked />
-      <span class="radio-custom" aria-hidden="true"></span>
-      <span class="radio-label-text">Base</span>
-    </label>
-
-    <label class="radio-option">
-      <input type="radio" name="heat-mode" value="Advanzado" />
-      <span class="radio-custom" aria-hidden="true"></span>
-      <span class="radio-label-text">Advanzado</span>
-    </label>
-  </div>
-</div>
-
+        <!-- Rounds input -->
+        <input type="number" id="rounds-input" class="input-log-box" placeholder="Rondas"/>
 
         <!-- Points Limit -->
-        <input
-          type="number"
-          id="pts-limit-input"
-          class="input-log-box"
-          placeholder="Límite de Puntos"
-          value="200"
-        />
+        <input type="number" id="pts-limit-input" class="input-log-box" placeholder="Límite de Puntos" value="200"/>
 
         <!-- No winners checkbox -->
         <div class="no-winner-checkbox">
@@ -130,16 +82,6 @@
             </thead>
             <tbody id="scores-body"></tbody>
           </table>
-          <div class="table-controls">
-            <button type="button" id="add-row">↓</button>
-            <button type="button" id="remove-row">↑</button>
-          </div>
-        </div>
-
-        <!-- First-timers container (Jugadores primerizos) -->
-        <div id="first-timers-container" class="f7-mades-container">
-          <label class="f7-mades-label">Jugadores primerizos</label>
-          <div id="first-timers-list" class="f7-mades-list"></div>
         </div>
 
         <!-- F7 Mades container -->
@@ -165,9 +107,43 @@
           <div id="f7-mades-list" class="f7-mades-list"></div>
         </div>
 
+        <!-- Heat extras -->
+        <div id="heat-extras" class="hidden">
+          <input type="text" id="heat-track-select" class="input-log-box" placeholder="Circuito" autocomplete="off" />
+          <ul id="heat-track-list"></ul>
+
+          <div class="heat-mode">
+            <label class="radio-option">
+              <input type="radio" name="heat-mode" value="Base" checked />
+              <span class="radio-custom"></span>
+              <span>Base</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="heat-mode" value="Advanzado" />
+              <span class="radio-custom"></span>
+              <span>Advanzado</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- First-Timers -->
+        <div id="first-timers-container" class="hidden">
+          <label class="first-timers-label">Jugadores primerizos</label>
+          <div id="first-timers-list" class="f7-mades-list"></div>
+        </div>
+
         <button type="submit" id="btn-submit">Enviar</button>
       </form>
     </section>
+
+    <!-- Player filter (new) -->
+    <div id="player-filter-wrapper" style="padding-left:32px; margin-top: 18px;">
+      <div id="player-filter-container" style="position: relative; max-width: 520px;">
+        <input id="player-filter-input" class="input-log-box" placeholder="Filtrar por jugadores" autocomplete="off" />
+        <ul id="player-filter-list"></ul>
+        <div id="player-filter-selected" style="margin-top:8px;"></div>
+      </div>
+    </div>
 
     <!-- Stats hub -->
     <div class="stats-grid" id="stats-grid"></div>

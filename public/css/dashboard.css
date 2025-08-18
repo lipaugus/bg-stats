@@ -1,5 +1,3 @@
-/* dashboard.css - updated: mobile scrolling + prevent input zoom fixes */
-
 /* --- Base / header --- */
 header {
   padding: 16px;
@@ -26,7 +24,7 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Floating log button */
+/* Floating action button */
 #btn-loggear {
   position: fixed;
   bottom: 20px;
@@ -75,7 +73,6 @@ input[type="number"] {
   -webkit-overflow-scrolling: touch; /* native momentum scrolling */
 }
 
-/* hide */
 #log-form-container.hidden { display: none; }
 
 /* Inner form card */
@@ -124,7 +121,7 @@ input[type="number"] {
   pointer-events: auto;
 }
 
-/* Input style shared */
+/* Shared input style */
 .input-log-box {
   background-color: #1b1b1b;
   color: white;
@@ -137,7 +134,7 @@ input[type="number"] {
   box-sizing: border-box;
 }
 
-/* Game dropdown list */
+/* Game input & list */
 #game-select {
   appearance: none;
   -webkit-appearance: none;
@@ -158,7 +155,7 @@ input[type="number"] {
   overflow-y: auto;
   color: white;
   background: #161616;
-  display: none;
+  display: none; /* hidden by default; JS will show/hide */
   z-index: 1000;
   font-size: 0.85rem;
   border-radius: 4px;
@@ -168,7 +165,7 @@ input[type="number"] {
 /* Date picker icon color */
 #date-played::-webkit-calendar-picker-indicator { filter: invert(1); }
 
-/* No-winner checkbox styling */
+/* No-winner checkbox */
 .no-winner-checkbox * { box-sizing: border-box; }
 .no-winner-checkbox .cbx {
   -webkit-user-select: none;
@@ -224,7 +221,7 @@ input[type="number"] {
   font-size:0.9rem;
 }
 
-/* Controls (unused) */
+/* Hide table controls (we're using rounds input) */
 .table-controls { display:none; }
 
 /* Submit button */
@@ -240,7 +237,20 @@ input[type="number"] {
 #btn-submit:hover { background: #7ad069; color: #161616; }
 
 /* Toast */
-.toast { position:fixed; top:20px; right:20px; background:#4caf50; color:#fff; padding:12px 16px; border-radius:4px; z-index:4000; }
+.toast {
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:#4caf50;
+  color:#fff;
+  padding:12px 16px;
+  border-radius:4px;
+  z-index:4000;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.toast .close-toast { background:transparent; border:none; color:white; font-size:1.2rem; cursor:pointer; }
 
 /* F7 & first-timers pills: match player-box visuals */
 .f7-mades-container { margin-top:12px; margin-bottom:10px; }
@@ -288,7 +298,7 @@ input[type="number"] {
   overflow-y:auto;
   color:white;
   background:#161616;
-  display:none;
+  display:none; /* JS controls visibility */
   z-index:1000;
   font-size:0.85rem;
   border-radius:4px;
@@ -311,27 +321,91 @@ input[type="number"] {
 /* Hide heat extras & first-timers when hidden */
 #heat-extras.hidden, #first-timers-container.hidden { display:none; }
 
-/* Small adjustments for small screens (prevent zoom & ensure scroll) */
+/* Player filter area (desktop: left aligned) */
+#player-filter-wrapper {
+  padding-left: 32px;  /* left gutter on desktop as you prefer */
+  padding-right: 0;
+}
+#player-filter-container {
+  position: relative;
+  max-width: 520px;
+  margin: 0; /* left-aligned container on desktop */
+}
+#player-filter-input {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #1b1b1b;
+  color: white;
+  padding: 7px;
+  border: 0;
+  border-bottom: 1px solid white;
+  border-radius: 0;
+  font-size: inherit;
+}
+#player-filter-list {
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  margin:0;
+  padding:0;
+  list-style:none;
+  max-height:150px;
+  overflow-y:auto;
+  color:white;
+  background:#161616;
+  display:none; /* hidden by default; JS shows it */
+  z-index:1000;
+  font-size:0.85rem;
+  border-radius:4px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.5);
+}
+#player-filter-selected {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:8px;
+}
+.player-filter-pill {
+  display:inline-flex;
+  align-items:center;
+  border:2px solid #ffffff;
+  color:#ffffff;
+  background:transparent;
+  padding:4px 12px;
+  border-radius:16px;
+  font-size:0.95rem;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* Ensure dropdowns hidden by default as a safeguard */
+#game-select-list, #player-filter-list, #heat-track-list { display: none; }
+
+/* --- Mobile-specific adjustments --- */
 @media screen and (max-width: 640px) {
-  /* keep a gap from edges and ensure form is scrollable rather than fixed-centered */
+  /* form gutters and sizing */
   #log-form {
     width: calc(100% - 24px) !important;
     max-width: calc(100% - 24px) !important;
+    min-width: 0 !important;
     padding: 16px !important;
     gap: 12px !important;
+    font-size: 0.9rem !important;
+    box-sizing: border-box;
     margin: 0 12px;
     border-radius: 12px;
     max-height: calc(100vh - 48px);
   }
 
-  /* Make overlay align to start so keyboard won't trap the centered form */
+  /* When visible, align to top so keyboard won't trap centered form */
   #log-form-container.visible {
     align-items: flex-start;
     justify-content: flex-start;
     padding-top: 18px;
   }
 
-  /* Enable smooth native scrolling on the container & form */
+  /* ensure overlay and form are scrollable */
   #log-form-container, #log-form {
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
@@ -340,28 +414,35 @@ input[type="number"] {
   /* Prevent iOS zoom-on-focus by making interactive controls >= 16px */
   input, select, textarea, .input-log-box,
   #heat-track-select, #players-enter, #f7-player-input, #f7-round-input, #rounds-input,
-  .score-table td input {
+  .score-table td input, #player-filter-input {
     font-size: 16px !important;
     line-height: 1.2;
   }
 
-  /* Keep pill & player fonts slightly smaller but >= 14 */
+  /* keep pill & player fonts slightly smaller but >= 14 */
   .f7-pill, .player-box { font-size: 14px !important; }
 
-  /* Slightly reduce dropdown font size to match */
-  #game-select-list, #heat-track-list { font-size: 0.85rem; }
+  /* dropdown font sizes */
+  #game-select-list, #heat-track-list, #player-filter-list { font-size: 0.85rem; }
 
-  /* Reduce some gaps for better fit */
+  /* Player filter wrapper: ensure equal gutters and centered input on mobile */
+  #player-filter-wrapper {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  #player-filter-container { max-width: calc(100% - 24px); margin: 0 auto; }
+
+  /* small screen polish */
   .f7-mades-label, .first-timers-label { font-size: 0.92rem; margin-bottom:6px; }
 }
 
-/* Additional small-screen polish */
+/* Very small phones */
 @media screen and (max-width: 360px) {
   #log-form { padding: 12px !important; }
   #btn-loggear { bottom: 12px; right: 12px; width:36px; height:36px; font-size:20px; }
 }
 
-/* animations */
+/* Animation keyframes */
 @-moz-keyframes wave-4 { 50% { transform: scale(0.9); } }
 @-webkit-keyframes wave-4 { 50% { transform: scale(0.9); } }
 @keyframes wave-4 { 50% { transform: scale(0.9); } }
