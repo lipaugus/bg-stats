@@ -220,7 +220,8 @@
     align-items: center !important;
     text-align: left !important;
     width: 100% !important;
-    padding: 12px 8px !important;
+    /* Make left/right padding match the barplot box on mobile */
+    padding: 15px !important;
   }
   
   .stat-box img {
