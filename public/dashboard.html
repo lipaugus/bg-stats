@@ -48,7 +48,7 @@
         <input type="number" id="pts-limit-input" class="input-log-box" placeholder="Límite de Puntos" value="200"/>
 
         <!-- No winners checkbox -->
-        <div class="no-winner-checkbox">
+        <div class="no-winner-checkbox" id="no-winner-wrapper">
           <input class="inp-cbx" id="no-winner-cbx" type="checkbox" />
           <label class="cbx" for="no-winner-cbx">
             <span>
@@ -73,6 +73,12 @@
           placeholder="Jugadores"
         />
         <div id="players-container"></div>
+
+        <!-- Positions container (for gamesWithPositions) -->
+        <div id="positions-container" class="positions-container hidden" aria-hidden="true">
+          <label class="positions-label">Posiciones</label>
+          <div id="positions-list" class="positions-list"></div>
+        </div>
 
         <!-- Points table -->
         <div id="scores-container">
@@ -137,11 +143,11 @@
     </section>
 
     <!-- Player filter (new) -->
-    <div id="player-filter-wrapper" style="padding-left:32px; margin-top: 18px;">
+    <div id="player-filter-wrapper" style="margin-top: 18px;">
       <div id="player-filter-container" style="position: relative; max-width: 520px;">
         <input id="player-filter-input" class="input-log-box" placeholder="Filtrar por jugadores" autocomplete="off" />
         <ul id="player-filter-list"></ul>
-        <div id="player-filter-selected" style="margin-top:8px;"></div>
+        <div id="player-filter-selected"></div>
       </div>
     </div>
 

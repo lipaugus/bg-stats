@@ -29,6 +29,9 @@ const games = [
 // Games that use scoring (show scoring table)
 const scoringGames = ["Jodete", "Flip 7"];
 
+// Games that require positions instead of winners-array
+const gamesWithPositions = ["Heat", "Azul"];
+
 // Only these games allow a points-limit
 const gamesWithPointLimits = ["Jodete"];
 
@@ -46,7 +49,12 @@ const ptsLimitInput = document.getElementById("pts-limit-input");
 const playerInput = document.getElementById("players-enter");
 const playersContainer = document.getElementById("players-container");
 const noWinnerCheckbox = document.getElementById("no-winner-cbx");
+const noWinnerWrapper = document.getElementById("no-winner-wrapper");
 const btnLog = document.getElementById("btn-loggear");
+
+// Positions UI elements
+const positionsContainer = document.getElementById("positions-container");
+const positionsListEl = document.getElementById("positions-list");
 
 // Heat elements
 const heatContainer = document.getElementById("heat-extras");
@@ -83,11 +91,14 @@ let allPlayers = [];          // unique players discovered in logs
 let selectedPlayers = [];     // currently selected filter players
 let players = [];             // players input for the form
 let playersColors = window.playersColors || {};
-let winnersList = [];
+let winnersList = [];         // used for non-position games (array)
 let points = {};
 let rowCount = 1;
 let firstTimers = [];
 let f7Mades = [];
+
+// positions order for ranked games
+let positionsOrder = []; // array of player names in current order
 
 // color palette
 const palette = [
@@ -106,8 +117,9 @@ if (scoresContainer) scoresContainer.style.display = "none";
 if (heatContainer) heatContainer.classList.add("hidden");
 if (f7Container) f7Container.classList.add("hidden");
 if (firstTimersContainer) firstTimersContainer.classList.add("hidden");
+if (positionsContainer) positionsContainer.classList.add("hidden");
 
-// Helper: Levenshtein (same as before)
+// Helper: Levenshtein
 function levenshtein(a, b) {
   const dp = Array(b.length + 1).fill(0).map((_, i) => i);
   for (let i = 1; i <= a.length; i++) {
@@ -122,7 +134,6 @@ function levenshtein(a, b) {
 }
 
 // --- PLAYER FILTER LOGIC ---
-// compute unique players from extracted_logs
 function computeAllPlayers(logs) {
   const set = new Set();
   logs.forEach(log => {
@@ -130,19 +141,15 @@ function computeAllPlayers(logs) {
   });
   return Array.from(set).sort((a,b) => a.localeCompare(b));
 }
-
-// matches for player filter (fuzzy up to 8)
 function getPlayerMatches(query) {
   const s = (query || "").trim().toLowerCase();
-  if (!s) return allPlayers.slice(0, 50); // reasonable cap
+  if (!s) return allPlayers.slice(0, 50);
   return allPlayers
     .map(p => ({ name: p, low: p.toLowerCase() }))
     .filter(o => o.low.startsWith(s) || levenshtein(o.low, s) <= 1)
     .slice(0, 8)
     .map(o => o.name);
 }
-
-// render the dropdown items for player filter
 function renderPlayerFilterList(items) {
   playerFilterList.innerHTML = "";
   if (!items || items.length === 0) {
@@ -154,7 +161,7 @@ function renderPlayerFilterList(items) {
     li.textContent = item;
     li.style.padding = '0.25em 0.5em';
     li.style.cursor = 'pointer';
-    li.addEventListener('mousedown', e => { // mousedown prevents input blur race
+    li.addEventListener('mousedown', e => {
       e.preventDefault();
       addSelectedPlayer(item);
       playerFilterList.style.display = 'none';
@@ -170,23 +177,17 @@ function renderPlayerFilterList(items) {
   });
   playerFilterList.style.display = 'block';
 }
-
-// add selected player pill (if not exist)
 function addSelectedPlayer(name) {
   if (!name) return;
   if (!selectedPlayers.includes(name)) selectedPlayers.push(name);
   renderPlayerFilterSelected();
   applyPlayerFilter();
 }
-
-// remove selected player
 function removeSelectedPlayer(name) {
   selectedPlayers = selectedPlayers.filter(p => p !== name);
   renderPlayerFilterSelected();
   applyPlayerFilter();
 }
-
-// render selected pills
 function renderPlayerFilterSelected() {
   playerFilterSelected.innerHTML = "";
   selectedPlayers.forEach(name => {
@@ -200,14 +201,10 @@ function renderPlayerFilterSelected() {
     playerFilterSelected.appendChild(pill);
   });
 }
-
-// apply filter on extracted_logs and update stats
 function applyPlayerFilter() {
   let filtered;
-  if (!selectedPlayers.length) {
-    filtered = extracted_logs;
-  } else {
-    // AND behaviour: include logs where ALL selectedPlayers are present
+  if (!selectedPlayers.length) filtered = extracted_logs;
+  else {
     filtered = extracted_logs.filter(log => {
       const logPlayers = log.players || [];
       return selectedPlayers.every(p => logPlayers.includes(p));
@@ -216,9 +213,8 @@ function applyPlayerFilter() {
   updateStats(filtered);
 }
 
-// --- existing scoring & UI logic (adapted & kept) ---
+// --- Scoring & UI logic ---
 
-// Keep points keys in sync with players[]
 function syncPointsWithPlayers() {
   players.forEach(name => {
     if (!points[name]) points[name] = Array(rowCount).fill('');
@@ -233,7 +229,6 @@ function syncPointsWithPlayers() {
   });
 }
 
-// Render the scores table (only for scoring games)
 function renderScoresTable() {
   if (!scoresContainer) return;
   const gameName = (gameInput.value || "").trim();
@@ -285,17 +280,17 @@ function renderPlayers() {
     box.className = 'player-box';
     box.style.borderColor = color;
     box.style.background = '#1e1e1e';
-    const selected = winnersList.includes(name);
-    if (selected) box.style.color = '#161616';
-    else box.style.color = color;
-
-    box.addEventListener('click', () => {
-      if (noWinnerCheckbox.checked) return;
-      const idx = winnersList.indexOf(name);
-      if (idx > -1) winnersList.splice(idx, 1);
-      else winnersList.push(name);
-      renderPlayers();
-    });
+    box.style.color = color;
+    const inPositionsMode = gamesWithPositions.includes((gameInput.value || "").trim());
+    if (!inPositionsMode) {
+      box.addEventListener('click', () => {
+        if (noWinnerCheckbox.checked) return;
+        const idx = winnersList.indexOf(name);
+        if (idx > -1) winnersList.splice(idx, 1);
+        else winnersList.push(name);
+        renderPlayers();
+      });
+    }
 
     const spanName = document.createElement('span');
     spanName.className = 'name';
@@ -310,35 +305,27 @@ function renderPlayers() {
       players = players.filter(p => p !== name);
       winnersList = winnersList.filter(p => p !== name);
       firstTimers = firstTimers.filter(p => p !== name);
+      positionsOrder = positionsOrder.filter(p => p !== name);
       renderPlayers();
+      renderPositionsList();
     });
     box.appendChild(rem);
     playersContainer.appendChild(box);
   });
 
+  // show/hide first-timers container depending on players length
   if (firstTimersContainer) {
     if (players.length > 0) firstTimersContainer.classList.remove('hidden');
     else firstTimersContainer.classList.add('hidden');
   }
+
+  // update scores table & positions UI
   renderScoresTable();
+  renderPositionsList();
   renderFirstTimers();
 }
 
-// Toast helper
-function showToast(msg, duration = 3000) {
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = msg;
-  const btn = document.createElement('button');
-  btn.className = 'close-toast';
-  btn.innerHTML = '&times;';
-  btn.onclick = () => toast.remove();
-  toast.appendChild(btn);
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), duration);
-}
-
-// First-timers rendering (uses same pill style, but background toggles)
+// renderFirstTimers unchanged
 function renderFirstTimers() {
   if (!firstTimersListEl) return;
   firstTimersListEl.innerHTML = '';
@@ -380,7 +367,6 @@ function renderF7Mades() {
     f7List.appendChild(pill);
   });
 }
-
 function addF7Hecho() {
   const p = (f7PlayerInput.value || '').trim();
   const r = (f7RoundInput.value || '').trim();
@@ -392,14 +378,119 @@ function addF7Hecho() {
   f7PlayerInput.focus();
 }
 
-// on game change UI
+// --- Positions UI (sortable, drag-only) ---
+function renderPositionsList() {
+  if (!positionsContainer || !positionsListEl) return;
+  const inPositionsMode = gamesWithPositions.includes((gameInput.value || "").trim());
+  if (!inPositionsMode) {
+    positionsContainer.classList.add('hidden');
+    positionsContainer.setAttribute('aria-hidden', 'true');
+    return;
+  }
+  // show
+  positionsContainer.classList.remove('hidden');
+  positionsContainer.setAttribute('aria-hidden', 'false');
+
+  // sync positionsOrder with players
+  positionsOrder = positionsOrder.filter(p => players.includes(p));
+  players.forEach(p => { if (!positionsOrder.includes(p)) positionsOrder.push(p); });
+
+  // build list
+  positionsListEl.innerHTML = '';
+  positionsOrder.forEach((name, idx) => {
+    const item = document.createElement('div');
+    item.className = 'position-item';
+    item.draggable = true;
+    item.dataset.index = idx;
+
+    // badge
+    const badge = document.createElement('span');
+    badge.className = 'pos-badge';
+    badge.textContent = (idx + 1);
+    item.appendChild(badge);
+
+    // player pill (reuse visuals)
+    const pill = document.createElement('div');
+    pill.className = 'player-box';
+    pill.style.borderColor = playersColors[name] || palette[idx % palette.length];
+    pill.style.background = '#1e1e1e';
+    pill.style.margin = '0';
+    pill.style.flex = '1';
+    pill.style.display = 'flex';
+    pill.style.justifyContent = 'space-between';
+    pill.style.alignItems = 'center';
+
+    const span = document.createElement('span');
+    span.textContent = name;
+    span.style.marginRight = '12px';
+    pill.appendChild(span);
+
+    item.appendChild(pill);
+
+    // drag handlers
+    item.addEventListener('dragstart', (ev) => {
+      ev.dataTransfer.setData('text/plain', String(idx));
+      ev.dataTransfer.effectAllowed = 'move';
+      item.classList.add('dragging');
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+    });
+    item.addEventListener('dragover', (ev) => {
+      ev.preventDefault();
+      ev.dataTransfer.dropEffect = 'move';
+    });
+    item.addEventListener('drop', (ev) => {
+      ev.preventDefault();
+      const srcIndex = Number(ev.dataTransfer.getData('text/plain'));
+      const destIndex = Number(item.dataset.index);
+      if (Number.isFinite(srcIndex) && Number.isFinite(destIndex) && srcIndex !== destIndex) {
+        const moved = positionsOrder.splice(srcIndex, 1)[0];
+        positionsOrder.splice(destIndex, 0, moved);
+        renderPositionsList();
+      }
+    });
+
+    // style item
+    item.style.display = 'flex';
+    item.style.alignItems = 'center';
+    item.style.gap = '12px';
+    item.style.padding = '6px';
+    item.style.border = '1px solid rgba(255,255,255,0.04)';
+    item.style.borderRadius = '10px';
+    item.style.marginBottom = '8px';
+    // transparent background; subtle shadow
+    item.style.background = 'rgba(255,255,255,0.01)';
+    item.style.boxShadow = '0 6px 18px rgba(0,0,0,0.6)';
+    item.style.cursor = 'grab';
+
+    positionsListEl.appendChild(item);
+  });
+}
+
+// Toast helper
+function showToast(msg, duration = 3000) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  const btn = document.createElement('button');
+  btn.className = 'close-toast';
+  btn.innerHTML = '&times;';
+  btn.onclick = () => toast.remove();
+  toast.appendChild(btn);
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), duration);
+}
+
+// handle game change UI
 function handleGameChange() {
-  const val = (gameInput.value || '').trim();
-  // pts limit
+  const val = (gameInput.value || "").trim();
+
+  // pts limit visibility
   if (gamesWithPointLimits.includes(val)) ptsLimitInput.style.display = '';
   else { ptsLimitInput.style.display = 'none'; ptsLimitInput.value = ''; }
 
-  // scoring
+  // scoring table visibility + rows based on rounds input
   if (scoringGames.includes(val)) {
     rowCount = Math.max(1, parseInt(roundsInput.value) || 1);
     renderScoresTable();
@@ -407,7 +498,7 @@ function handleGameChange() {
     if (scoresContainer) scoresContainer.style.display = 'none';
   }
 
-  // Flip7
+  // flip7 UI
   if (val.toLowerCase() === 'flip 7') {
     if (f7Container) f7Container.classList.remove('hidden');
   } else {
@@ -418,7 +509,7 @@ function handleGameChange() {
     }
   }
 
-  // Heat extras (placeholder remains 'Rondas')
+  // heat extras block
   if (val.toLowerCase() === 'heat') {
     if (heatContainer) heatContainer.classList.remove('hidden');
     roundsInput.placeholder = 'Rondas';
@@ -426,19 +517,33 @@ function handleGameChange() {
     if (heatContainer) {
       heatContainer.classList.add('hidden');
       if (heatTrackInput) heatTrackInput.value = '';
-      const checked = document.querySelector('input[name="heat-mode"]:checked');
-      if (checked) checked.checked = false;
       const baseRadio = document.querySelector('input[name="heat-mode"][value="Base"]');
       if (baseRadio) baseRadio.checked = true;
     }
     roundsInput.placeholder = 'Rondas';
   }
 
+  // positions mode? show positionsContainer and hide winners-style selection
+  const inPositionsMode = gamesWithPositions.includes(val);
+  if (inPositionsMode) {
+    if (positionsContainer) positionsContainer.classList.remove('hidden');
+    if (noWinnerWrapper) noWinnerWrapper.classList.add('hidden');
+    positionsOrder = [...players];
+  } else {
+    if (positionsContainer) positionsContainer.classList.add('hidden');
+    if (noWinnerWrapper) noWinnerWrapper.classList.remove('hidden');
+    positionsOrder = [];
+  }
+
   if (players.length > 0 && firstTimersContainer) firstTimersContainer.classList.remove('hidden');
   else if (firstTimersContainer) firstTimersContainer.classList.add('hidden');
+
+  // re-render UI parts
+  renderPlayers();
+  renderPositionsList();
 }
 
-// Dropdown rendering for games (same as before)
+// Dropdown list for games
 function getMatches(query) {
   const s = (query || '').trim().toLowerCase();
   if (!s) return games;
@@ -448,7 +553,6 @@ function getMatches(query) {
     .slice(0, 8)
     .map(o => o.name);
 }
-
 function renderList(items) {
   gameList.innerHTML = '';
   if (!items.length) { gameList.style.display = 'none'; return; }
@@ -511,7 +615,7 @@ function renderTrackList(items) {
   heatTrackList.style.display = 'block';
 }
 
-// render scores when rounds change
+// rounds input changes
 if (roundsInput) {
   roundsInput.addEventListener('input', () => {
     rowCount = Math.max(1, parseInt(roundsInput.value) || 1);
@@ -527,7 +631,7 @@ if (roundsInput) {
   });
 }
 
-// wiring for player input add
+// add player on Enter
 playerInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -553,13 +657,12 @@ btnLog.addEventListener('click', () => {
   formContainer.classList.toggle('hidden', !now);
   btnLog.classList.toggle('active', now);
   btnLog.textContent = now ? '✖' : '+';
-  // ensure overlay aligns properly on mobile when opened
   if (now && window.innerWidth <= 640) {
     setTimeout(()=> { document.getElementById('log-form').scrollTop = 0; }, 20);
   }
 });
 
-// heat track input behavior (open only on focus/input)
+// heat track input behavior
 if (heatTrackInput) {
   heatTrackInput.addEventListener('input', () => {
     renderTrackList(heatTracks.filter(t => t.toLowerCase().startsWith((heatTrackInput.value||'').toLowerCase())));
@@ -580,19 +683,20 @@ if (f7AddBtn) f7AddBtn.addEventListener('click', addF7Hecho);
   });
 });
 
-// -- Player filter input events
+// player filter events
 playerFilterInput.addEventListener('input', () => {
   renderPlayerFilterList(getPlayerMatches(playerFilterInput.value));
 });
 playerFilterInput.addEventListener('focus', () => renderPlayerFilterList(allPlayers.slice(0, 50)));
 playerFilterInput.addEventListener('blur', () => setTimeout(()=> { playerFilterList.style.display = 'none'; }, 120));
 
-// --- submit handler ---
+// submit handler
 document.getElementById('log-form').addEventListener('submit', async e => {
   e.preventDefault();
 
   const cleanedPoints = {};
   const gameName = (gameInput.value || '').trim();
+
   if (scoringGames.includes(gameName)) {
     Object.keys(points).forEach(name => {
       cleanedPoints[name] = points[name].map(v => {
@@ -615,11 +719,21 @@ document.getElementById('log-form').addEventListener('submit', async e => {
   })();
   if (!gamesWithPointLimits.includes(gameInput.value)) limit_points = null;
 
+  // Build winners payload depending on positions mode
+  let winnersPayload = null;
+  if (gamesWithPositions.includes(gameName)) {
+    // positionsOrder should have the sorted player names
+    winnersPayload = {};
+    positionsOrder.forEach((p, idx) => { winnersPayload[idx + 1] = p; });
+  } else {
+    winnersPayload = winnersList.length ? [...winnersList] : [];
+  }
+
   const payload = {
     date: dateInput.value,
     game: gameInput.value,
     players: [...players],
-    winners: [...winnersList],
+    winners: winnersPayload,
     points: scoringGames.includes(gameName) ? cleanedPoints : null,
     rounds: roundsVal,
     duration,
@@ -657,6 +771,7 @@ document.getElementById('log-form').addEventListener('submit', async e => {
     rowCount = 1;
     firstTimers = [];
     f7Mades = [];
+    positionsOrder = [];
 
     gameInput.value = '';
     durationInput.value = '';
@@ -669,32 +784,34 @@ document.getElementById('log-form').addEventListener('submit', async e => {
     if (heatContainer) heatContainer.classList.add('hidden');
     roundsInput.placeholder = 'Rondas';
     if (scoresContainer) scoresContainer.style.display = 'none';
+    if (positionsContainer) positionsContainer.classList.add('hidden');
+    if (noWinnerWrapper) noWinnerWrapper.classList.remove('hidden');
     renderPlayers();
     renderF7Mades();
     renderFirstTimers();
+
+    // refetch logs so stats get updated
+    await fetchLogs();
   } catch (err) {
     console.error(err);
     alert('Error guardando, ver consola');
   }
 });
 
-// --- Stats rendering plumbing ---
-// We'll keep persistent stat divs and re-use them on filter updates
+// Stats rendering plumbing
 const mostPlayedDiv = document.createElement('div');
 const barplotDiv = document.createElement('div');
 
-// updateStats(logs) calls exports from stats.js
 import { renderMostPlayedStat, renderWinsBarplot } from './stats.js';
 function updateStats(logs) {
   statsGrid.innerHTML = '';
   statsGrid.appendChild(mostPlayedDiv);
   statsGrid.appendChild(barplotDiv);
-  // call the renderers with the filtered logs and the dedicated containers
   renderMostPlayedStat(logs, mostPlayedDiv);
   renderWinsBarplot(logs, barplotDiv);
 }
 
-// --- Fetch logs and initialize UI ---
+// Fetch logs and initialize UI
 async function fetchLogs() {
   try {
     const res = await fetch('/api/logs_extraction');
@@ -712,13 +829,11 @@ async function fetchLogs() {
   // initial stats render (no filter)
   updateStats(extracted_logs);
 
-  // Do NOT auto-open the player-filter dropdown on load.
-  // Previously we rendered the dropdown here which caused it to be visible immediately.
-  // Now we only populate the list data (allPlayers) and render selected pills (none).
+  // do not auto-open filter list here
   renderPlayerFilterSelected();
 }
 
-// Sample logs for dev fallback (kept small)
+// SAMPLE_LOGS (kept)
 const SAMPLE_LOGS = [
   {
     date: "2025-08-03",

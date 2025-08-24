@@ -1,8 +1,18 @@
-/* dashboard.css (restored + safe player-filter additions) */
+/* dashboard.css (full updated) */
 
+/* ------------------------------
+   Header / base
+   ------------------------------ */
 header {
   padding: 16px;
   display: flex;
+}
+
+/* Prevent text-size-adjust quirks on mobile */
+html, body {
+  -webkit-text-size-adjust: 100%;
+  height: 100%;
+  margin: 0;
 }
 
 /* Remove up/down arrows in Chrome, Safari, Edge */
@@ -18,6 +28,7 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* Floating action button */
 #btn-loggear {
   position: fixed;
   bottom: 20px;
@@ -37,31 +48,22 @@ input[type="number"] {
     color 0.2s ease;
   line-height: 0;
 }
-#btn-loggear:hover {
-  background: #7ad069;
-  color: #161616;
-}
+#btn-loggear:hover { background: #7ad069; color: #161616; }
 #btn-loggear.active {
   font-size: 16px;
   background: #161616;
   border-color: #e74c3c;
   color: #e74c3c;
   transform: rotate(90deg);
-  transition: transform 0.3s ease, background 0.2s ease, border-color 0.2s ease,
-    color 0.2s ease;
 }
-#btn-loggear.active:hover {
-  background: #e74c3c;
-  border-color: #e74c3c;
-  color: #161616;
-}
+#btn-loggear.active:hover { background: #e74c3c; color: #161616; }
 
-/* Hide any "hidden" class element*/
-.hidden {
-  display: none;
-}
+/* Utility */
+.hidden { display: none; }
 
-/* Log form big container */
+/* ------------------------------
+   Overlay / form container
+   ------------------------------ */
 #log-form-container {
   position: fixed;
   top: 0;
@@ -74,12 +76,14 @@ input[type="number"] {
   align-items: center;
   justify-content: center;
   overflow: auto; /* Allow scrolling */
+  -webkit-overflow-scrolling: touch;
 }
 
 #log-form-container.hidden {
   display: none;
 }
 
+/* Inner form card */
 #log-form {
   background-color: #1e1e1e;
   padding: 32px;
@@ -92,31 +96,23 @@ input[type="number"] {
   flex-direction: column;
   gap: 18px;
   box-sizing: border-box;
+
+  /* allow internal scroll when content too tall */
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Mobile */
-@media screen and (max-width: 640px) {
-  #log-form {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    min-width: 0 !important;
-    padding: 16px 8px !important;
-    gap: 12px !important;
-    font-size: 0.9rem !important;
-    box-sizing: border-box;
-  }
-  #log-form-container {
-    padding: 0 !important;
-  }
-  /* Ensure close button is above the form */
-  #btn-loggear {
-    z-index: 3001 !important;
-  }
+/* Baseline font sizing inside form */
+#log-form, #log-form * {
+  font-size: 0.92rem;
+  box-sizing: border-box;
 }
 
+/* Form header */
 #log-form h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   text-align: center;
 }
 
@@ -134,7 +130,7 @@ input[type="number"] {
   pointer-events: auto;
 }
 
-/* Log input boxes */
+/* Shared input style */
 .input-log-box {
   background-color: #1b1b1b;
   color: white;
@@ -142,9 +138,12 @@ input[type="number"] {
   border: 0;
   border-bottom: 1px solid white;
   border-radius: 0 !important;
+  font-size: inherit;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Remove dropdown arrow from game select box */
+/* Game input & dropdown list */
 #game-select {
   appearance: none;
   -webkit-appearance: none;
@@ -169,10 +168,12 @@ input[type="number"] {
   background: #161616;
   display: none;
   z-index: 1000;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
 }
 
-/* Change calendar logo on date picker to white */
+/* Date picker icon color */
 #date-played::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
@@ -192,17 +193,9 @@ input[type="number"] {
   display: inline-block;
   font-size: 0.8rem;
 }
-.no-winner-checkbox .cbx:not(:last-child) {
-  margin-right: 6px;
-}
-.no-winner-checkbox .cbx:hover {
-  background: rgba(99, 99, 99, 0.06);
-}
-.no-winner-checkbox .cbx span {
-  float: left;
-  vertical-align: middle;
-  transform: translate3d(0, 0, 0);
-}
+.no-winner-checkbox .cbx:not(:last-child) { margin-right: 6px; }
+.no-winner-checkbox .cbx:hover { background: rgba(99, 99, 99, 0.06); }
+.no-winner-checkbox .cbx span { float: left; vertical-align: middle; transform: translate3d(0,0,0); }
 .no-winner-checkbox .cbx span:first-child {
   position: relative;
   width: 18px;
@@ -228,17 +221,9 @@ input[type="number"] {
   transition-delay: 0.1s;
   transform: translate3d(0, 0, 0);
 }
-.no-winner-checkbox .cbx span:last-child {
-  padding-left: 8px;
-  line-height: 18px;
-}
-.no-winner-checkbox .cbx:hover span:first-child {
-  border-color: #07f;
-}
-.no-winner-checkbox .inp-cbx {
-  position: absolute;
-  visibility: hidden;
-}
+.no-winner-checkbox .cbx span:last-child { padding-left: 8px; line-height: 18px; }
+.no-winner-checkbox .cbx:hover span:first-child { border-color: #07f; }
+.no-winner-checkbox .inp-cbx { position: absolute; visibility: hidden; }
 .no-winner-checkbox .inp-cbx:checked + .cbx span:first-child {
   background: #07f;
   border-color: #07f;
@@ -271,15 +256,10 @@ input[type="number"] {
   align-items: center;
   cursor: pointer;
   user-select: none;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
 }
-.player-box .name {
-  margin-right: 8px;
-}
-.player-box .remove {
-  cursor: pointer;
-  font-size: 0.8rem;
-}
+.player-box .name { margin-right: 8px; }
+.player-box .remove { cursor: pointer; font-size: 0.9rem; }
 
 /* Scores table base */
 .score-table {
@@ -289,25 +269,14 @@ input[type="number"] {
   background: #1e1e1e;
   color: white;
 }
-
-/* Header cells: background injected inline */
 .score-table th {
   padding: 8px;
   text-transform: uppercase;
   font-size: 0.9rem;
   border-radius: 0 !important;
 }
-
-/* Data cells: inputs stretch full width */
-#scores-container {
-  align-items: center; /* vertical centering */
-  gap: 16px;
-}
-
-.score-table td {
-  padding: 4px;
-  border-radius: 0 !important;
-}
+#scores-container { align-items: center; gap: 16px; }
+.score-table td { padding: 4px; border-radius: 0 !important; }
 .score-table td input {
   width: 100%;
   background: transparent;
@@ -320,26 +289,8 @@ input[type="number"] {
   border-radius: 0 !important;
 }
 
-/* Table controls styling */
-.table-controls {
-  display: flex;
-  justify-content: center; /* center the buttons in the column */
-  gap: 8px;
-  margin-top: 10px;
-}
-.table-controls button {
-  background: transparent;
-  border: 2px solid #333333;
-  color: #333333;
-  padding: 4px 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 6px;
-}
-.table-controls button:hover {
-  background: #333333;
-  color: #1e1e1e;
-}
+/* Hide the old row control arrows (we don't use them) */
+.table-controls { display: none; }
 
 /* Submit button */
 #btn-submit {
@@ -351,13 +302,9 @@ input[type="number"] {
   cursor: pointer;
   border-radius: 10px;
 }
-#btn-submit:hover {
-  background: #7ad069;
-  color: #161616;
-}
+#btn-submit:hover { background: #7ad069; color: #161616; }
 
-/* Toast popup for successful save in mongodb */
-/* Toast notification */
+/* Toast popup */
 .toast {
   position: fixed;
   top: 20px;
@@ -366,14 +313,13 @@ input[type="number"] {
   color: white;
   padding: 12px 16px;
   border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   display: flex;
   align-items: center;
   gap: 8px;
   z-index: 4000;
   font-size: 0.9rem;
 }
-
 .toast .close-toast {
   background: transparent;
   border: none;
@@ -383,22 +329,16 @@ input[type="number"] {
   cursor: pointer;
 }
 
-.f7-mades-container {
-  margin-top: 18px;
-  margin-bottom: 10px;
-}
-.f7-mades-label {
+/* F7 mades and first timers */
+.f7-mades-container { margin-top: 18px; margin-bottom: 10px; }
+.f7-mades-label, .first-timers-label {
   display: block;
-  font-weight: normal;   /* Not bold */
-  font-size: 1rem;       /* Match input size */
+  font-weight: normal;
+  font-size: 0.95rem;
   margin-bottom: 6px;
-  color: #ccc;           /* Match input label color */
+  color: #ccc;
 }
-.f7-mades-input-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
+.f7-mades-input-row { display: flex; gap: 8px; align-items: center; }
 .f7-add-btn {
   background: #222;
   color: #7ad069;
@@ -410,213 +350,94 @@ input[type="number"] {
   height: 36px;
   transition: background 0.2s;
 }
-.f7-add-btn:hover {
-  background: #333;
-}
-.f7-mades-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
+.f7-add-btn:hover { background: #333; }
+.f7-mades-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .f7-pill {
   display: flex;
   align-items: center;
   border: 2px solid #fff;
   border-radius: 18px;
   padding: 4px 12px;
-  font-size: 1rem;
-  background: transparent;
+  font-size: 0.95rem;
+  background: #1e1e1e;
   color: #fff;
   margin-bottom: 4px;
   gap: 8px;
   font-family: inherit;
 }
-.f7-pill .f7-pill-delete {
-  background: none;
-  border: none;
-  color: inherit;
-  font-size: 1.1em;
-  margin-left: 4px;
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 0 4px;
-  line-height: 1;
-}
+.f7-pill .f7-pill-delete { background: none; border: none; color: inherit; font-size: 0.95rem; margin-left: 4px; cursor: pointer; }
 
-@media screen and (max-width: 640px) {
-  /* 1) Pin the toggle button smaller in the corner */
-  button#btn-loggear {
-    position: fixed !important;
-    bottom: 12px !important;
-    right: 12px !important;
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 20px !important;
-    padding: 0 !important;
-  }
-
-  /* 2) When visible, force the form container full-screen */
-  #log-form-container.visible {
-    display: flex !important; /* override the .hidden display:none */
-    flex-direction: column; /* center its contents */
-    align-items: center;
-    justify-content: center;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 16px !important;
-    background: rgba(0, 0, 0, 0.85) !important;
-    opacity: 1 !important; /* override any opacity animation */
-    transform: translateY(0) !important; /* override any translate */
-    pointer-events: auto !important;
-    z-index: 2000 !important;
-  }
-
-  /* 3) Shrink & center the inner form */
-  #log-form {
-    width: 100% !important;
-    max-width: 360px !important;
-    padding: 16px !important;
-    gap: 12px !important;
-    font-size: 0.9rem !important;
-  }
-
-  /* 4) Smaller inputs, table, buttons */
-  .input-log-box,
-  #scores-container input,
-  .table-controls button,
-  #btn-submit {
-    font-size: 0.8rem !important;
-  }
-
-  .score-table th {
-    font-size: 0.8rem !important;
-    padding: 6px !important;
-  }
-}
-
-@media screen and (max-width: 640px) {
-  .no-winner-checkbox .cbx {
-    width: 100%;
-    display: inline-block;
-  }
-}
-@-moz-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-@-webkit-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-@-o-keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-@keyframes wave-4 {
-  50% {
-    transform: scale(0.9);
-  }
-}
-
-/* Heat inputs (kept from your later changes) */
-#heat-extras {
-  margin-top: 8px;
-}
-#heat-track-select.input-log-box {
+/* Heat extras */
+#heat-extras { margin-top: 8px; position: relative; }
+#heat-track-select {
   width: 100%;
+  padding: 7px;
+  background-color: #1b1b1b;
+  color: white;
+  border: 0;
+  border-bottom: 1px solid white;
+  margin-top: 6px;
+  font-size: inherit;
   box-sizing: border-box;
-  margin-top: 8px;
 }
-#heat-track-select::placeholder {
-  color: #9b9b9b;
-}
-
-/* Make radio buttons stacked and look consistent across devices */
-.heat-mode {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: #ccc;
-  font-size: 0.95rem;
-  user-select: none;
-}
-
-/* Hide native radio, show custom circle */
-.radio-option input[type="radio"] {
-  display: none;
-}
-.radio-custom {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 2px solid #ccc;
-  display: inline-block;
-  margin-right: 8px;
-  vertical-align: middle;
-  background: transparent;
-  position: relative;
-}
-.radio-custom::after {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #161616;
+#heat-track-list {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(0.6);
-  opacity: 0;
-  transition: opacity 0.12s ease;
-}
-.radio-option input[type="radio"]:checked + .radio-custom {
-  border-color: #7ad069;
-  background: #7ad069;
-}
-.radio-option input[type="radio"]:checked + .radio-custom::after {
-  opacity: 1;
-}
-
-/* Ensure the heat-extras block does not occupy space when hidden */
-#heat-extras.hidden {
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 150px;
+  overflow-y: auto;
+  color: white;
+  background: #161616;
   display: none;
+  z-index: 1000;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
 }
+#heat-track-list li { padding: 0.25em 0.5em; cursor: pointer; }
+#heat-track-list li:hover { background: rgba(255,255,255,0.03); }
 
-/* --- Player filter additions (safe, minimal) --- */
-/* Desktop: left-aligned like original layout */
+/* Radio buttons for Heat (stacked & custom) */
+.heat-mode { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.radio-option { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #ccc; font-size: 0.92rem; user-select: none; }
+.radio-option input[type="radio"] { display: none; }
+.radio-custom {
+  width: 16px; height: 16px; border-radius: 50%; border: 2px solid #ccc; position: relative; display: inline-block; margin-right: 6px;
+}
+.radio-custom::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #161616; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) scale(0.6); opacity: 0; transition: opacity 0.12s; }
+.radio-option input[type="radio"]:checked + .radio-custom { border-color: #7ad069; background: #7ad069; }
+.radio-option input[type="radio"]:checked + .radio-custom::after { opacity: 1; }
+
+/* Ensure heat-extras / first-timers do not occupy space when hidden */
+#heat-extras.hidden, #first-timers-container.hidden { display: none; }
+
+/* ------------------------------
+   Player filter block (left on desktop, centered on mobile)
+   ------------------------------ */
 #player-filter-wrapper {
-  padding-left: 32px;
+  padding-left: 32px; /* desktop left gutter */
   padding-right: 0;
+  margin-top: 18px;
 }
 #player-filter-container {
   position: relative;
   max-width: 520px;
-  margin: 0; /* left-aligned on desktop */
+  margin: 0; /* left aligned on desktop */
 }
 #player-filter-input {
+  width: 100%;
+  box-sizing: border-box;
   background-color: #1b1b1b;
   color: white;
   padding: 7px;
   border: 0;
   border-bottom: 1px solid white;
-  width: 100%;
-  box-sizing: border-box;
+  border-radius: 0;
+  font-size: inherit;
 }
 #player-filter-list {
   position: absolute;
@@ -632,36 +453,182 @@ input[type="number"] {
   background: #161616;
   display: none;
   z-index: 1000;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.6);
 }
 #player-filter-selected {
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
 }
 .player-filter-pill {
-  display:inline-flex;
-  align-items:center;
-  border:2px solid #ffffff;
-  color:#ffffff;
-  background:transparent;
-  padding:4px 12px;
-  border-radius:16px;
-  font-size:0.95rem;
-  cursor:pointer;
-  user-select:none;
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  user-select: none;
 }
 
-/* Mobile: center and give equal gutters */
+/* ensure dropdowns hidden by default */
+#game-select-list, #player-filter-list, #heat-track-list { display: none; }
+
+/* ------------------------------
+   Positions UI (transparent, shadow, drag-only)
+   ------------------------------ */
+.positions-container {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+.positions-label {
+  display: block;
+  font-weight: normal;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: #ccc;
+}
+.positions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Each row: subtle transparent card + shadow */
+.position-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.01);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.03);
+  cursor: grab;
+}
+
+/* active drag cursor */
+.position-item:active { cursor: grabbing; }
+
+/* number badge */
+.pos-badge {
+  min-width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* inside player-pill */
+.position-item .player-box {
+  flex: 1;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #1e1e1e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* remove symbol size */
+.position-item .player-box .remove { font-size: 0.9rem; margin-left: 8px; }
+
+/* f7-pill and first timers match player-box visuals */
+.f7-pill, #first-timers-list .f7-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid;
+  border-radius: 16px;
+  padding: 4px 12px;
+  background: #1e1e1e;
+  color: #fff;
+  font-size: 0.92rem;
+}
+
+/* dragging visual */
+.position-item.dragging {
+  opacity: 0.6;
+  transform: scale(0.995);
+}
+
+/* ------------------------------
+   Mobile-specific adjustments
+   ------------------------------ */
 @media screen and (max-width: 640px) {
+  /* form gutters and sizing */
+  #log-form {
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+    min-width: 0 !important;
+    padding: 16px !important;
+    gap: 12px !important;
+    font-size: 0.9rem !important;
+    box-sizing: border-box;
+    margin: 0 12px;
+    border-radius: 12px;
+    max-height: calc(100vh - 48px);
+  }
+
+  /* When visible, align to top so keyboard won't trap centered form */
+  #log-form-container.visible {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 18px;
+  }
+
+  /* ensure overlay and form are scrollable */
+  #log-form-container, #log-form {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+
+  /* Prevent iOS zoom-on-focus by making interactive controls >= 16px */
+  input, select, textarea, .input-log-box,
+  #heat-track-select, #players-enter, #f7-player-input, #f7-round-input, #rounds-input,
+  .score-table td input, #player-filter-input {
+    font-size: 16px !important;
+    line-height: 1.2;
+  }
+
+  /* slightly smaller but legible pills */
+  .f7-pill, .player-box { font-size: 14px !important; }
+
+  /* dropdown fonts */
+  #game-select-list, #heat-track-list, #player-filter-list { font-size: 0.85rem; }
+
+  /* Player filter centered with equal gutters on mobile */
   #player-filter-wrapper {
     padding-left: 12px !important;
     padding-right: 12px !important;
   }
   #player-filter-container { max-width: calc(100% - 24px); margin: 0 auto; }
-  #player-filter-input { font-size: 16px !important; } /* keep >=16px to prevent zoom */
-  .player-filter-pill { font-size: 14px !important; }
+
+  /* ensure positions spacing balanced */
+  .position-item { padding: 10px; gap: 10px; }
+  .pos-badge { min-width: 30px; height: 30px; font-size: 0.95rem; }
+  .position-item.dragging { transform: none; } /* avoid big transform on mobile */
 }
+
+/* very small phones */
+@media screen and (max-width: 360px) {
+  #log-form { padding: 12px !important; }
+  #btn-loggear { bottom: 12px; right: 12px; width: 36px; height: 36px; font-size: 20px; }
+}
+
+/* keyframes */
+@-moz-keyframes wave-4 { 50% { transform: scale(0.9); } }
+@-webkit-keyframes wave-4 { 50% { transform: scale(0.9); } }
+@keyframes wave-4 { 50% { transform: scale(0.9); } }
