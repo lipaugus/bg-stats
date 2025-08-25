@@ -106,13 +106,13 @@ const palette = [
   "#8FFF33","#808080","#dc6aff","#ff8787","#5e5bff","#67ff74","#ffeb7a","#ff95e5","#ffffff"
 ];
 
-// default date
+// Default date to today
 dateInput.valueAsDate = new Date();
 
-// hide pts-limit initially
+// Hide pts-limit on load
 ptsLimitInput.style.display = "none";
 
-// hide optional blocks initially
+// Hide optional blocks initially
 if (scoresContainer) scoresContainer.style.display = "none";
 if (heatContainer) heatContainer.classList.add("hidden");
 if (f7Container) f7Container.classList.add("hidden");
@@ -325,7 +325,7 @@ function renderPlayers() {
   renderFirstTimers();
 }
 
-// renderFirstTimers unchanged
+// renderFirstTimers (fixed text color contrast)
 function renderFirstTimers() {
   if (!firstTimersListEl) return;
   firstTimersListEl.innerHTML = '';
@@ -333,9 +333,15 @@ function renderFirstTimers() {
     const pill = document.createElement('span');
     pill.className = 'f7-pill';
     pill.textContent = name;
+
+    const selected = firstTimers.includes(name);
+    const bg = selected ? (playersColors[name] || '#fff') : '#1e1e1e';
+    pill.style.background = bg;
     pill.style.borderColor = playersColors[name] || '#fff';
-    pill.style.color = playersColors[name] || '#fff';
-    pill.style.background = firstTimers.includes(name) ? (playersColors[name] || '#fff') : '#1e1e1e';
+
+    // Ensure readable text: when selected (bg is player color) use dark text; otherwise use player color or white
+    pill.style.color = selected ? '#161616' : (playersColors[name] || '#fff');
+
     pill.addEventListener('click', () => {
       const idx = firstTimers.indexOf(name);
       if (idx > -1) firstTimers.splice(idx, 1);
@@ -378,7 +384,7 @@ function addF7Hecho() {
   f7PlayerInput.focus();
 }
 
-// --- Positions UI (sortable, drag-only) ---
+// --- Positions UI (sortable) ---
 function renderPositionsList() {
   if (!positionsContainer || !positionsListEl) return;
   const inPositionsMode = gamesWithPositions.includes((gameInput.value || "").trim());
@@ -391,7 +397,7 @@ function renderPositionsList() {
   positionsContainer.classList.remove('hidden');
   positionsContainer.setAttribute('aria-hidden', 'false');
 
-  // sync positionsOrder with players
+  // ensure positionsOrder has same players (initially same order as players[])
   positionsOrder = positionsOrder.filter(p => players.includes(p));
   players.forEach(p => { if (!positionsOrder.includes(p)) positionsOrder.push(p); });
 
@@ -459,7 +465,6 @@ function renderPositionsList() {
     item.style.border = '1px solid rgba(255,255,255,0.04)';
     item.style.borderRadius = '10px';
     item.style.marginBottom = '8px';
-    // transparent background; subtle shadow
     item.style.background = 'rgba(255,255,255,0.01)';
     item.style.boxShadow = '0 6px 18px rgba(0,0,0,0.6)';
     item.style.cursor = 'grab';
@@ -527,7 +532,9 @@ function handleGameChange() {
   const inPositionsMode = gamesWithPositions.includes(val);
   if (inPositionsMode) {
     if (positionsContainer) positionsContainer.classList.remove('hidden');
+    // hide the no-winner checkbox when using positions
     if (noWinnerWrapper) noWinnerWrapper.classList.add('hidden');
+    // initialize positionsOrder with players current order
     positionsOrder = [...players];
   } else {
     if (positionsContainer) positionsContainer.classList.add('hidden');
@@ -690,7 +697,16 @@ playerFilterInput.addEventListener('input', () => {
 playerFilterInput.addEventListener('focus', () => renderPlayerFilterList(allPlayers.slice(0, 50)));
 playerFilterInput.addEventListener('blur', () => setTimeout(()=> { playerFilterList.style.display = 'none'; }, 120));
 
-// submit handler
+// Ensure game input toggles UI both on typing and on selection/change
+gameInput.addEventListener('input', () => {
+  renderList(getMatches(gameInput.value));
+  handleGameChange();
+});
+gameInput.addEventListener('change', () => handleGameChange());
+gameInput.addEventListener('focus', () => renderList(getMatches(gameInput.value)));
+gameInput.addEventListener('blur', () => setTimeout(()=> { gameList.style.display = 'none'; }, 120));
+
+// submit handler (formats date as DD/MM/YYYY)
 document.getElementById('log-form').addEventListener('submit', async e => {
   e.preventDefault();
 
@@ -729,8 +745,22 @@ document.getElementById('log-form').addEventListener('submit', async e => {
     winnersPayload = winnersList.length ? [...winnersList] : [];
   }
 
+  // Format date to DD/MM/YYYY for storage
+  let payloadDate = null;
+  try {
+    if (dateInput.value) {
+      const d = new Date(dateInput.value);
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      payloadDate = `${dd}/${mm}/${yyyy}`;
+    }
+  } catch (_) {
+    payloadDate = dateInput.value || null;
+  }
+
   const payload = {
-    date: dateInput.value,
+    date: payloadDate,
     game: gameInput.value,
     players: [...players],
     winners: winnersPayload,
@@ -790,7 +820,7 @@ document.getElementById('log-form').addEventListener('submit', async e => {
     renderF7Mades();
     renderFirstTimers();
 
-    // refetch logs so stats get updated
+    // refetch logs so stats get updated (optional)
     await fetchLogs();
   } catch (err) {
     console.error(err);
@@ -833,10 +863,10 @@ async function fetchLogs() {
   renderPlayerFilterSelected();
 }
 
-// SAMPLE_LOGS (kept)
+// SAMPLE_LOGS
 const SAMPLE_LOGS = [
   {
-    date: "2025-08-03",
+    date: "03/08/2025",
     duration: 21,
     game: "Jodete",
     limit_points: 200,
@@ -847,18 +877,18 @@ const SAMPLE_LOGS = [
     _id: "1"
   },
   {
-    date: "2025-08-06",
+    date: "06/08/2025",
     duration: 15,
     game: "Azul",
     limit_points: 100,
     players: ['Mica', 'Lucas', 'Ariel'],
     points: { Mica: [10,20,15,25], Lucas: [15,25,20,30], Ariel: [12,18,22,28] },
     rounds: 4,
-    winners: ['Lucas'],
+    winners: {1: 'Lucas', 2: 'Mica', 3: 'Ariel'},
     _id: "2"
   },
   {
-    date: "2025-08-09",
+    date: "09/08/2025",
     duration: 18,
     game: "Jodete",
     limit_points: 200,

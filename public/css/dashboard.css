@@ -166,7 +166,7 @@ input[type="number"] {
   overflow-y: auto;
   color: white;
   background: #161616;
-  display: none;
+  display: none; /* JS controls visibility */
   z-index: 1000;
   font-size: 0.85rem;
   border-radius: 4px;
@@ -193,9 +193,17 @@ input[type="number"] {
   display: inline-block;
   font-size: 0.8rem;
 }
-.no-winner-checkbox .cbx:not(:last-child) { margin-right: 6px; }
-.no-winner-checkbox .cbx:hover { background: rgba(99, 99, 99, 0.06); }
-.no-winner-checkbox .cbx span { float: left; vertical-align: middle; transform: translate3d(0,0,0); }
+.no-winner-checkbox .cbx:not(:last-child) {
+  margin-right: 6px;
+}
+.no-winner-checkbox .cbx:hover {
+  background: rgba(99, 99, 99, 0.06);
+}
+.no-winner-checkbox .cbx span {
+  float: left;
+  vertical-align: middle;
+  transform: translate3d(0, 0, 0);
+}
 .no-winner-checkbox .cbx span:first-child {
   position: relative;
   width: 18px;
@@ -221,9 +229,17 @@ input[type="number"] {
   transition-delay: 0.1s;
   transform: translate3d(0, 0, 0);
 }
-.no-winner-checkbox .cbx span:last-child { padding-left: 8px; line-height: 18px; }
-.no-winner-checkbox .cbx:hover span:first-child { border-color: #07f; }
-.no-winner-checkbox .inp-cbx { position: absolute; visibility: hidden; }
+.no-winner-checkbox .cbx span:last-child {
+  padding-left: 8px;
+  line-height: 18px;
+}
+.no-winner-checkbox .cbx:hover span:first-child {
+  border-color: #07f;
+}
+.no-winner-checkbox .inp-cbx {
+  position: absolute;
+  visibility: hidden;
+}
 .no-winner-checkbox .inp-cbx:checked + .cbx span:first-child {
   background: #07f;
   border-color: #07f;
@@ -258,8 +274,13 @@ input[type="number"] {
   user-select: none;
   font-size: 0.95rem;
 }
-.player-box .name { margin-right: 8px; }
-.player-box .remove { cursor: pointer; font-size: 0.9rem; }
+.player-box .name {
+  margin-right: 8px;
+}
+.player-box .remove {
+  cursor: pointer;
+  font-size: 0.9rem;
+}
 
 /* Scores table base */
 .score-table {
@@ -281,7 +302,7 @@ input[type="number"] {
   width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent; /* will color-bottom inline */
+  border-bottom: 2px solid transparent;
   color: white;
   text-align: center;
   padding: 4px 0;
@@ -475,9 +496,6 @@ input[type="number"] {
   cursor: pointer;
   user-select: none;
 }
-
-/* ensure dropdowns hidden by default */
-#game-select-list, #player-filter-list, #heat-track-list { display: none; }
 
 /* ------------------------------
    Positions UI (transparent, shadow, drag-only)

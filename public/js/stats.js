@@ -59,7 +59,7 @@ export function renderWinsBarplot(logs, container) {
 
   // --- Get all unique players and games ---
   const allPlayers = Array.from(
-    new Set(logs.flatMap(log => log.players))
+    new Set(logs.flatMap(log => log.players || []))
   );
   const allGames = Array.from(
     new Set(logs.map(log => log.game))
@@ -73,7 +73,16 @@ export function renderWinsBarplot(logs, container) {
     const wins = {};
     allPlayers.forEach(p => wins[p] = 0);
     filteredLogs.forEach(log => {
-      (log.winners || []).forEach(winner => {
+      // Support two winners formats:
+      // - array of winners: ['Ariel']
+      // - positions object: {1: 'Raye', 2: 'Maika'}
+      const winnersRaw = log.winners;
+      let winnersArr = [];
+      if (Array.isArray(winnersRaw)) winnersArr = winnersRaw;
+      else if (winnersRaw && typeof winnersRaw === 'object') winnersArr = Object.values(winnersRaw);
+      // else keep empty
+
+      winnersArr.forEach(winner => {
         if (wins[winner] !== undefined) wins[winner]++;
       });
     });
@@ -106,7 +115,7 @@ export function renderWinsBarplot(logs, container) {
     const { sortable } = getWinsData();
 
     let maxValue = mode === "total"
-      ? Math.max(...sortable.map(s => s.value))
+      ? Math.max(0, ...sortable.map(s => s.value))
       : 100;
 
     let bars = "";
